@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editar alumno | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 92%;
+            max-width: 750px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 24px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            padding: 28px;
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+        }
+
+        .formulario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bfc5cc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #198754;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        button,
+        .boton-secundario {
+            padding: 10px 17px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        button {
+            color: white;
+            background-color: #198754;
+        }
+
+        button:hover {
+            background-color: #157347;
+        }
+
+        button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .boton-secundario {
+            color: #212529;
+            background-color: #e9ecef;
+        }
+
+        .boton-secundario:hover {
+            background-color: #d3d6d8;
+        }
+
+        .mensaje {
+            margin-bottom: 20px;
+            padding: 13px;
+            border-radius: 5px;
+            background-color: #eef3f8;
+        }
+
+        .mensaje-exito {
+            color: #0f5132;
+            background-color: #d1e7dd;
+        }
+
+        .mensaje-error {
+            color: #842029;
+            background-color: #f8d7da;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        @media (max-width: 650px) {
+            .formulario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campo-completo {
+                grid-column: auto;
+            }
+
+            .acciones {
+                flex-direction: column-reverse;
+            }
+
+            button,
+            .boton-secundario {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Editar alumno</h1>
+
+        <p>
+            Actualiza la información personal del alumno.
+        </p>
+    </header>
+
+    <section class="panel">
+
+        <input type="hidden"
+               id="idAlumno"
+               th:value="${idAlumno}">
+
+        <div id="mensajeEstado"
+             class="mensaje">
+            Cargando información del alumno...
+        </div>
+
+        <form id="formularioAlumno"
+              class="oculto">
+
+            <div class="formulario-grid">
+
+                <div class="campo">
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input id="nombres"
+                           name="nombres"
+                           type="text"
+                           maxlength="100"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input id="apellidos"
+                           name="apellidos"
+                           type="text"
+                           maxlength="100"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="tipoDocumento">
+                        Tipo de documento
+                    </label>
+
+                    <select id="tipoDocumento"
+                            name="tipoDocumento"
+                            required>
+
+                        <option value="">
+                            Seleccione
+                        </option>
+
+                        <option value="DNI">
+                            DNI
+                        </option>
+
+                        <option value="CARNET_EXTRANJERIA">
+                            Carnet de extranjería
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="numeroDocumento">
+                        Número de documento
+                    </label>
+
+                    <input id="numeroDocumento"
+                           name="numeroDocumento"
+                           type="text"
+                           maxlength="20"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="fechaNacimiento">
+                        Fecha de nacimiento
+                    </label>
+
+                    <input id="fechaNacimiento"
+                           name="fechaNacimiento"
+                           type="date">
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input id="telefono"
+                           name="telefono"
+                           type="text"
+                           maxlength="20">
+                </div>
+
+                <div class="campo campo-completo">
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+                    <input id="correo"
+                           name="correo"
+                           type="email"
+                           maxlength="100"
+                           required>
+                </div>
+
+            </div>
+
+            <div class="acciones">
+
+                <a class="boton-secundario"
+                   th:href="@{/admin/alumnos}">
+                    Cancelar
+                </a>
+
+                <button id="botonGuardar"
+                        type="submit">
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/admin/editar-alumno.js}"></script>
+
+</body>
+</html>

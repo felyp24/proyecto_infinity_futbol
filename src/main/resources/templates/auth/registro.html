@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Registro | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 92%;
+            max-width: 850px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            padding: 30px;
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+        }
+
+        .seccion-titulo {
+            grid-column: 1 / -1;
+            margin: 6px 0 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 17px;
+        }
+
+        .formulario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #bfc5cc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #198754;
+        }
+
+        .ayuda {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 14px;
+            margin-top: 25px;
+        }
+
+        .acciones a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .acciones a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #198754;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background-color: #157347;
+        }
+
+        button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .mensaje {
+            margin-bottom: 20px;
+            padding: 13px;
+            border-radius: 5px;
+            background-color: #eef3f8;
+        }
+
+        .mensaje-exito {
+            color: #0f5132;
+            background-color: #d1e7dd;
+        }
+
+        .mensaje-error {
+            color: #842029;
+            background-color: #f8d7da;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        @media (max-width: 650px) {
+            .formulario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campo-completo,
+            .seccion-titulo {
+                grid-column: auto;
+            }
+
+            .acciones {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .acciones a {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Crear una cuenta</h1>
+
+        <p>
+            Regístrate para acceder a los servicios de Infinity Fútbol.
+        </p>
+    </header>
+
+    <section class="panel">
+
+        <div id="mensajeEstado"
+             class="mensaje oculto">
+        </div>
+
+        <form id="formularioRegistro">
+
+            <div class="formulario-grid">
+
+                <h2 class="seccion-titulo">
+                    Datos de acceso
+                </h2>
+
+                <div class="campo">
+                    <label for="username">
+                        Nombre de usuario
+                    </label>
+
+                    <input id="username"
+                           name="username"
+                           type="text"
+                           minlength="4"
+                           maxlength="50"
+                           autocomplete="username"
+                           required>
+
+                    <span class="ayuda">
+                        Debe contener entre 4 y 50 caracteres.
+                    </span>
+                </div>
+
+                <div class="campo">
+                    <label for="correo">
+                        Correo electrónico
+                    </label>
+
+                    <input id="correo"
+                           name="correo"
+                           type="email"
+                           maxlength="100"
+                           autocomplete="email"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <input id="password"
+                           name="password"
+                           type="password"
+                           minlength="8"
+                           maxlength="100"
+                           autocomplete="new-password"
+                           required>
+
+                    <span class="ayuda">
+                        Debe contener al menos 8 caracteres.
+                    </span>
+                </div>
+
+                <div class="campo">
+                    <label for="confirmarPassword">
+                        Confirmar contraseña
+                    </label>
+
+                    <input id="confirmarPassword"
+                           name="confirmarPassword"
+                           type="password"
+                           autocomplete="new-password"
+                           required>
+                </div>
+
+                <h2 class="seccion-titulo">
+                    Datos personales
+                </h2>
+
+                <div class="campo">
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input id="nombres"
+                           name="nombres"
+                           type="text"
+                           maxlength="100"
+                           autocomplete="given-name"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input id="apellidos"
+                           name="apellidos"
+                           type="text"
+                           maxlength="100"
+                           autocomplete="family-name"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="tipoDocumento">
+                        Tipo de documento
+                    </label>
+
+                    <select id="tipoDocumento"
+                            name="tipoDocumento"
+                            required>
+
+                        <option value="">
+                            Seleccione
+                        </option>
+
+                        <option value="DNI">
+                            DNI
+                        </option>
+
+                        <option value="CARNET_EXTRANJERIA">
+                            Carnet de extranjería
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="numeroDocumento">
+                        Número de documento
+                    </label>
+
+                    <input id="numeroDocumento"
+                           name="numeroDocumento"
+                           type="text"
+                           maxlength="20"
+                           required>
+                </div>
+
+                <div class="campo">
+                    <label for="fechaNacimiento">
+                        Fecha de nacimiento
+                    </label>
+
+                    <input id="fechaNacimiento"
+                           name="fechaNacimiento"
+                           type="date">
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input id="telefono"
+                           name="telefono"
+                           type="tel"
+                           maxlength="20"
+                           autocomplete="tel">
+                </div>
+
+            </div>
+
+            <div class="acciones">
+
+                <a th:href="@{/login}">
+                    Ya tengo una cuenta
+                </a>
+
+                <button id="botonRegistrar"
+                        type="submit">
+                    Crear cuenta
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/auth/registro.js}"></script>
+
+</body>
+</html>

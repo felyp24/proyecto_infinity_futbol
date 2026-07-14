@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Gestión de roles | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 92%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 24px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+            min-width: 150px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            background-color: #198754;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #157347;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .estado-activo {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .estado-inactivo {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .mensaje {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 6px;
+            background-color: #eef3f8;
+        }
+
+        .mensaje-error {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        .boton-deshabilitar {
+            background-color: #dc3545;
+        }
+
+        .boton-deshabilitar:hover {
+            background-color: #bb2d3b;
+        }
+
+        .boton-habilitar {
+            background-color: #0d6efd;
+        }
+
+        .boton-habilitar:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
+</head>
+
+<body th:attr="data-id-usuario-actual=${idUsuarioActual}">
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Gestión de roles</h1>
+
+        <p>
+            Consulta los usuarios registrados y administra
+            sus permisos dentro del sistema.
+        </p>
+
+        <button id="botonLogout"
+                class="boton-logout"
+                type="button">
+            Cerrar sesión
+        </button>
+    </header>
+
+    <section class="panel">
+
+        <h2>Usuarios y roles</h2>
+
+        <div id="mensajeEstado"
+             class="mensaje">
+            Cargando usuarios...
+        </div>
+
+        <div id="tablaContenedor"
+             class="tabla-contenedor oculto">
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                    <th>Fecha de creación</th>
+                    <th>Rol</th>
+                    <th>Guardar rol</th>
+                    <th>Acceso</th>
+                </tr>
+                </thead>
+
+                <tbody id="tablaUsuarios">
+                </tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/admin/roles.js}"></script>
+<script th:src="@{/js/auth/logout.js}"></script>
+</body>
+</html>

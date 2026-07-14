@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mi perfil | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 92%;
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 24px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            margin-bottom: 20px;
+            padding: 24px;
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .datos {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .dato {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .dato-etiqueta {
+            font-size: 13px;
+            font-weight: bold;
+            color: #606770;
+        }
+
+        .dato-valor {
+            min-height: 20px;
+            font-size: 15px;
+        }
+
+        .estado {
+            display: inline-block;
+            width: fit-content;
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .estado-activo {
+            color: #0f5132;
+            background-color: #d1e7dd;
+        }
+
+        .estado-inactivo {
+            color: #842029;
+            background-color: #f8d7da;
+        }
+
+        .rol {
+            display: inline-block;
+            margin-right: 6px;
+            margin-bottom: 5px;
+            padding: 5px 9px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            font-size: 13px;
+        }
+
+        @media (max-width: 650px) {
+            .datos {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .boton-logout {
+            padding: 9px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #dc3545;
+            cursor: pointer;
+        }
+
+        .boton-logout:hover {
+            background-color: #bb2d3b;
+        }
+
+        .boton-logout:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Mi perfil</h1>
+
+        <p>
+            Consulta la información registrada en tu cuenta.
+        </p>
+
+        <button id="botonLogout"
+                class="boton-logout"
+                type="button">
+            Cerrar sesión
+        </button>
+    </header>
+
+    <section class="panel">
+
+        <h2>Información de la cuenta</h2>
+
+        <div class="datos">
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Nombre de usuario
+                </span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.username}">
+                    usuario.prueba
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Correo electrónico
+                </span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.correo}">
+                    correo@ejemplo.com
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Estado de la cuenta
+                </span>
+
+                <span class="estado"
+                      th:text="${perfil.estadoUsuario}"
+                      th:classappend="${perfil.estadoUsuario.name() == 'ACTIVO'}
+                            ? ' estado-activo'
+                            : ' estado-inactivo'">
+                    ACTIVO
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Rol
+                </span>
+
+                <div>
+                    <span class="rol"
+                          th:each="rol : ${perfil.roles}"
+                          th:text="${rol}">
+                        USUARIO
+                    </span>
+
+                    <span th:if="${perfil.roles.isEmpty()}">
+                        Sin rol asignado
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <h2>Datos personales</h2>
+
+        <div class="datos">
+
+            <div class="dato">
+                <span class="dato-etiqueta">Nombres</span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.nombres != null
+                            ? perfil.nombres
+                            : 'No registrado'}">
+                    Usuario
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">Apellidos</span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.apellidos != null
+                            ? perfil.apellidos
+                            : 'No registrado'}">
+                    De Prueba
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Tipo de documento
+                </span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.tipoDocumento != null
+                            ? perfil.tipoDocumento
+                            : 'No registrado'}">
+                    DNI
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Número de documento
+                </span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.numeroDocumento != null
+                            ? perfil.numeroDocumento
+                            : 'No registrado'}">
+                    70000001
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">
+                    Fecha de nacimiento
+                </span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.fechaNacimiento != null
+                            ? #temporals.format(
+                                perfil.fechaNacimiento,
+                                'dd/MM/yyyy'
+                              )
+                            : 'No registrada'}">
+                    15/01/2000
+                </span>
+            </div>
+
+            <div class="dato">
+                <span class="dato-etiqueta">Teléfono</span>
+
+                <span class="dato-valor"
+                      th:text="${perfil.telefono != null
+                            ? perfil.telefono
+                            : 'No registrado'}">
+                    999111222
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <div th:if="${perfil.idAlumno != null}"
+         style="margin-top: 20px;">
+
+        <a th:href="@{/perfil/editar}"
+           style="
+           display: inline-block;
+           padding: 10px 16px;
+           border-radius: 5px;
+           background-color: #198754;
+           color: white;
+           text-decoration: none;
+       ">
+            Editar datos personales
+        </a>
+        <a th:href="@{/perfil/seguridad}"
+           style="
+       display: inline-block;
+       margin-left: 8px;
+       padding: 10px 16px;
+       border-radius: 5px;
+       background-color: #495057;
+       color: white;
+       text-decoration: none;
+   ">
+            Usuario y contraseña
+        </a>
+
+    </div>
+
+</main>
+
+<script th:src="@{/js/auth/logout.js}"></script>
+
+</body>
+</html>

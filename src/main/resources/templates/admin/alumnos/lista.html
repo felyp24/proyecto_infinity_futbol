@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Lista de alumnos | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 95%;
+            max-width: 1300px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            padding: 24px;
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+        }
+
+        .resumen {
+            margin-bottom: 16px;
+            color: #606770;
+            font-size: 14px;
+        }
+
+        .tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .estado-activo {
+            color: #0f5132;
+            background-color: #d1e7dd;
+        }
+
+        .estado-inactivo {
+            color: #842029;
+            background-color: #f8d7da;
+        }
+
+        .mensaje {
+            padding: 14px;
+            border-radius: 6px;
+            background-color: #eef3f8;
+        }
+
+        .mensaje-error {
+            color: #842029;
+            background-color: #f8d7da;
+        }
+
+        .paginacion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .paginacion-botones {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #198754;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #157347;
+        }
+
+        button:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        @media (max-width: 650px) {
+            .paginacion {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .paginacion-botones {
+                justify-content: space-between;
+            }
+
+            .buscador {
+                flex-direction: column;
+            }
+
+            .buscador input,
+            .buscador button {
+                width: 100%;
+            }
+        }
+
+        .boton-editar {
+            display: inline-block;
+            padding: 8px 13px;
+            border-radius: 5px;
+            color: white;
+            background-color: #0d6efd;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .boton-editar:hover {
+            background-color: #0b5ed7;
+        }
+
+        .buscador {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .buscador input {
+            flex: 1;
+            min-width: 220px;
+            padding: 10px 12px;
+            border: 1px solid #bfc5cc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .buscador input:focus {
+            outline: none;
+            border-color: #198754;
+        }
+
+        .boton-limpiar {
+            background-color: #6c757d;
+        }
+
+        .boton-limpiar:hover {
+            background-color: #5c636a;
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Lista de alumnos</h1>
+
+        <p>
+            Consulta los alumnos registrados en Infinity Fútbol.
+        </p>
+
+        <button id="botonLogout"
+                class="boton-logout"
+                type="button">
+            Cerrar sesión
+        </button>
+    </header>
+
+    <section class="panel">
+
+        <div id="mensajeEstado"
+             class="mensaje">
+            Cargando alumnos...
+        </div>
+
+        <div id="contenidoAlumnos"
+             class="oculto">
+
+            <form id="formularioBusqueda"
+                  class="buscador">
+
+                <input id="textoBusqueda"
+                       type="search"
+                       placeholder="Buscar por nombre, apellido, documento o correo"
+                       maxlength="100"
+                       autocomplete="off">
+
+                <button type="submit">
+                    Buscar
+                </button>
+
+                <button id="botonLimpiar"
+                        class="boton-limpiar"
+                        type="button">
+                    Limpiar
+                </button>
+
+            </form>
+
+            <div id="resumen"
+                 class="resumen">
+            </div>
+
+            <div class="tabla-contenedor">
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Documento</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Estado alumno</th>
+                        <th>Estado cuenta</th>
+                        <th>Fecha de registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="tablaAlumnos">
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="paginacion">
+
+                <span id="informacionPagina">
+                </span>
+
+                <div class="paginacion-botones">
+
+                    <button id="botonAnterior"
+                            type="button">
+                        Anterior
+                    </button>
+
+                    <button id="botonSiguiente"
+                            type="button">
+                        Siguiente
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/admin/alumnos.js}"></script>
+
+<script th:src="@{/js/auth/logout.js}"></script>
+
+</body>
+</html>

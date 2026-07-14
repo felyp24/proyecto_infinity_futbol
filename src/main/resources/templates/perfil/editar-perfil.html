@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editar perfil | Infinity Fútbol</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #212529;
+        }
+
+        .contenedor {
+            width: 92%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .encabezado {
+            margin-bottom: 24px;
+        }
+
+        .encabezado h1 {
+            margin: 0 0 8px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #606770;
+        }
+
+        .panel {
+            padding: 24px;
+            background-color: white;
+            border: 1px solid #dfe3e8;
+            border-radius: 8px;
+        }
+
+        .formulario {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #198754;
+            outline: none;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .boton {
+            display: inline-block;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .boton-volver {
+            color: #212529;
+            background-color: #e9ecef;
+        }
+
+        .boton-guardar {
+            color: white;
+            background-color: #198754;
+            cursor: pointer;
+        }
+
+        .boton-guardar:hover {
+            background-color: #157347;
+        }
+
+        .boton-guardar:disabled {
+            background-color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .mensaje {
+            display: none;
+            margin-bottom: 20px;
+            padding: 14px;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 650px) {
+            .formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .campo-completo {
+                grid-column: auto;
+            }
+
+            .acciones {
+                flex-direction: column-reverse;
+            }
+
+            .boton {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="contenedor">
+
+    <header class="encabezado">
+        <h1>Editar datos personales</h1>
+
+        <p>
+            Actualiza la información registrada en tu perfil.
+        </p>
+    </header>
+
+    <section class="panel">
+
+        <div id="mensaje"
+             class="mensaje">
+        </div>
+
+        <form id="formEditarPerfil">
+
+            <div class="formulario">
+
+                <div class="campo">
+                    <label for="nombres">
+                        Nombres
+                    </label>
+
+                    <input id="nombres"
+                           name="nombres"
+                           type="text"
+                           maxlength="100"
+                           required
+                           th:value="${perfil.nombres}">
+                </div>
+
+                <div class="campo">
+                    <label for="apellidos">
+                        Apellidos
+                    </label>
+
+                    <input id="apellidos"
+                           name="apellidos"
+                           type="text"
+                           maxlength="100"
+                           required
+                           th:value="${perfil.apellidos}">
+                </div>
+
+                <div class="campo">
+                    <label for="tipoDocumento">
+                        Tipo de documento
+                    </label>
+
+                    <select id="tipoDocumento"
+                            name="tipoDocumento"
+                            required>
+
+                        <option value="DNI"
+                                th:selected="${perfil.tipoDocumento == 'DNI'}">
+                            DNI
+                        </option>
+
+                        <option value="CARNET_EXTRANJERIA"
+                                th:selected="${perfil.tipoDocumento == 'CARNET_EXTRANJERIA'}">
+                            Carné de extranjería
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="numeroDocumento">
+                        Número de documento
+                    </label>
+
+                    <input id="numeroDocumento"
+                           name="numeroDocumento"
+                           type="text"
+                           maxlength="20"
+                           required
+                           th:value="${perfil.numeroDocumento}">
+                </div>
+
+                <div class="campo">
+                    <label for="fechaNacimiento">
+                        Fecha de nacimiento
+                    </label>
+
+                    <input id="fechaNacimiento"
+                           name="fechaNacimiento"
+                           type="date"
+                           th:value="${perfil.fechaNacimiento}">
+                </div>
+
+                <div class="campo">
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input id="telefono"
+                           name="telefono"
+                           type="text"
+                           maxlength="20"
+                           th:value="${perfil.telefono}">
+                </div>
+
+            </div>
+
+            <div class="acciones">
+
+                <a class="boton boton-volver"
+                   th:href="@{/perfil}">
+                    Cancelar
+                </a>
+
+                <button id="botonGuardar"
+                        class="boton boton-guardar"
+                        type="submit">
+                    Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+<script th:src="@{/js/perfil/editar-perfil.js}"></script>
+</body>
+</html>
