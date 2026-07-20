@@ -131,6 +131,13 @@ public class SecurityConfig {
                                 "ADMINISTRADOR"
                         )
 
+                        .requestMatchers(
+                                "/inicio",
+                                "/inicio/**",
+                                "/api/inicio/**"
+                        )
+                        .hasRole("USUARIO")
+
                         /*
                          * El resto necesita autenticación.
                          */

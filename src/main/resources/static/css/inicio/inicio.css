@@ -1,0 +1,474 @@
+/*
+   ESTILOS GENERALES
+*/
+
+body {
+    margin: 0;
+    background-color: #f4f6f8;
+    color: #212529;
+}
+
+
+/*
+   BARRA PRINCIPAL
+*/
+
+.barra-principal {
+    background-color: #143d2b;
+    color: #ffffff;
+}
+
+.marca {
+    color: #ffffff;
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.marca:hover,
+.marca:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+
+/*
+   TÍTULOS
+*/
+
+.titulo-principal {
+    color: #143d2b;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.titulo-seccion {
+    color: #143d2b;
+    font-weight: 700;
+}
+
+
+/*
+   TARJETAS DE RESUMEN
+*/
+
+.tarjeta-resumen {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: 100%;
+    padding: 22px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e3e7ea;
+    border-radius: 12px;
+}
+
+.etiqueta-resumen {
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+
+.valor-resumen {
+    margin: 0;
+
+    color: #143d2b;
+
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.icono-resumen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+
+    background-color: #d1e7dd;
+    color: #143d2b;
+
+    border-radius: 50%;
+
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+
+/*
+   PANEL DEL CALENDARIO
+*/
+
+.panel-calendario {
+    padding: 24px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e3e7ea;
+    border-radius: 12px;
+}
+
+
+/*
+   LEYENDA DEL CALENDARIO
+*/
+
+.leyenda-calendario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.elemento-leyenda {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.color-leyenda {
+    display: inline-block;
+
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+}
+
+.color-leyenda.disponible {
+    background-color: #198754;
+}
+
+.color-leyenda.reservada {
+    background-color: #0d6efd;
+}
+
+.color-leyenda.sin-cupos {
+    background-color: #6c757d;
+}
+
+
+/*
+   FULLCALENDAR: ESTRUCTURA GENERAL
+*/
+
+.fc {
+    color: #212529;
+}
+
+.fc .fc-toolbar-title {
+    color: #143d2b;
+
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.fc .fc-button-primary {
+    background-color: #143d2b;
+    border-color: #143d2b;
+}
+
+.fc .fc-button-primary:hover,
+.fc .fc-button-primary:focus {
+    background-color: #0f3021;
+    border-color: #0f3021;
+}
+
+.fc .fc-button-primary:disabled {
+    background-color: #9ca3a8;
+    border-color: #9ca3a8;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: #102c20;
+    border-color: #102c20;
+}
+
+.fc .fc-day-today {
+    background-color: #f0f7f3 !important;
+}
+
+.fc .fc-event {
+    cursor: pointer;
+    text-decoration: none !important;
+}
+
+
+/*
+   FULLCALENDAR: EVENTOS EN VISTA MES
+*/
+
+.fc .fc-daygrid-event {
+    padding: 3px 5px;
+
+    border-radius: 6px;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    text-decoration: none !important;
+}
+
+.fc .fc-daygrid-event .fc-event-main,
+.fc .fc-daygrid-event .fc-event-main-frame,
+.fc .fc-daygrid-event .fc-event-time,
+.fc .fc-daygrid-event .fc-event-title,
+.fc .fc-daygrid-event .fc-event-title-container {
+    color: #ffffff !important;
+}
+
+.fc .fc-daygrid-event .fc-event-time {
+    font-weight: 600;
+}
+
+.fc .fc-daygrid-event .fc-event-title {
+    font-weight: 600;
+}
+
+/*
+ * FullCalendar puede mostrar un punto antes de la hora
+ * en la vista mensual. Se oculta porque el evento ya
+ * utiliza un bloque completo con su color correspondiente.
+ */
+.fc .fc-daygrid-event-dot {
+    display: none !important;
+}
+
+
+/*
+   FULLCALENDAR: EVENTOS EN VISTA SEMANA
+*/
+
+.fc .fc-timegrid-event {
+    border-radius: 6px;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.fc .fc-timegrid-event .fc-event-main,
+.fc .fc-timegrid-event .fc-event-main-frame,
+.fc .fc-timegrid-event .fc-event-time,
+.fc .fc-timegrid-event .fc-event-title,
+.fc .fc-timegrid-event .fc-event-title-container {
+    color: #ffffff !important;
+}
+
+.fc .fc-timegrid-event .fc-event-time {
+    font-weight: 600;
+}
+
+.fc .fc-timegrid-event .fc-event-title {
+    font-weight: 600;
+}
+
+
+/*
+   FULLCALENDAR: VISTA LISTA
+*/
+
+/*
+ * En la vista Lista el fondo de cada fila es blanco.
+ * Por eso el texto debe mantenerse oscuro.
+ */
+.fc .fc-list-event-time,
+.fc .fc-list-event-title,
+.fc .fc-list-event-title a {
+    color: #212529 !important;
+}
+
+.fc .fc-list-event-title a {
+    font-weight: 600;
+    text-decoration: none !important;
+}
+
+.fc .fc-list-event-title a:hover {
+    color: #143d2b !important;
+    text-decoration: underline !important;
+}
+
+.fc .fc-list-event:hover td {
+    background-color: #f3f6f4;
+}
+
+.fc .fc-list-day-cushion {
+    background-color: #f2f3f4;
+}
+
+.fc .fc-list-day-text,
+.fc .fc-list-day-side-text {
+    color: #143d2b;
+    font-weight: 700;
+}
+
+
+/*
+   COLORES DE LOS EVENTOS
+*/
+
+/*
+ * Clase disponible
+ */
+.fc .evento-disponible {
+    --fc-event-bg-color: #198754;
+    --fc-event-border-color: #198754;
+    --fc-event-text-color: #ffffff;
+
+    background-color: #198754;
+    border-color: #198754;
+}
+
+/*
+ * Clase reservada por el cliente
+ */
+.fc .evento-reservada {
+    --fc-event-bg-color: #0d6efd;
+    --fc-event-border-color: #0d6efd;
+    --fc-event-text-color: #ffffff;
+
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+/*
+ * Clase sin cupos disponibles
+ */
+.fc .evento-sin-cupos {
+    --fc-event-bg-color: #6c757d;
+    --fc-event-border-color: #6c757d;
+    --fc-event-text-color: #ffffff;
+
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+/*
+ * Clase que ya comenzó
+ */
+.fc .evento-iniciada {
+    --fc-event-bg-color: #dc7609;
+    --fc-event-border-color: #dc7609;
+    --fc-event-text-color: #ffffff;
+
+    background-color: #dc7609;
+    border-color: #dc7609;
+}
+
+
+/*
+   PUNTOS DE COLOR EN LA VISTA LISTA
+*/
+
+
+.fc .evento-disponible .fc-list-event-dot {
+    border-color: #198754 !important;
+}
+
+.fc .evento-reservada .fc-list-event-dot {
+    border-color: #0d6efd !important;
+}
+
+.fc .evento-sin-cupos .fc-list-event-dot {
+    border-color: #6c757d !important;
+}
+
+.fc .evento-iniciada .fc-list-event-dot {
+    border-color: #dc7609 !important;
+}
+
+
+/*
+   EFECTO AL PASAR EL CURSOR
+*/
+
+.fc .fc-daygrid-event:hover,
+.fc .fc-timegrid-event:hover {
+    filter: brightness(0.92);
+}
+
+
+/*
+   MODAL DE DETALLES
+*/
+
+.detalle-clase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.detalle-item {
+    display: flex;
+    flex-direction: column;
+
+    padding: 12px;
+
+    background-color: #f6f7f8;
+
+    border: 1px solid #eceff1;
+    border-radius: 8px;
+}
+
+.detalle-etiqueta {
+    margin-bottom: 3px;
+
+    color: #6c757d;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.aviso-credito {
+    padding: 12px;
+
+    background-color: #fff3cd;
+    color: #664d03;
+
+    border: 1px solid #ffecb5;
+    border-radius: 8px;
+}
+
+
+/*
+   DISEÑO RESPONSIVE
+*/
+
+@media (max-width: 767px) {
+
+    .titulo-principal {
+        font-size: 1.4rem;
+    }
+
+    .panel-calendario {
+        padding: 15px;
+    }
+
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1.15rem;
+        text-align: center;
+    }
+
+    .fc .fc-header-toolbar {
+        margin-bottom: 1rem;
+    }
+
+    .fc .fc-daygrid-event {
+        padding: 2px 3px;
+        font-size: 0.78rem;
+    }
+
+    .detalle-clase {
+        grid-template-columns: 1fr;
+    }
+}

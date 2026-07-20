@@ -140,6 +140,14 @@ public class LoginService {
             return "/admin/roles";
         }
 
+        if (roles.contains("COORDINADOR")) {
+            return "/coordinador/clases";
+        }
+
+        if (roles.contains("USUARIO")) {
+            return "/inicio";
+        }
+
         return "/perfil";
     }
 }

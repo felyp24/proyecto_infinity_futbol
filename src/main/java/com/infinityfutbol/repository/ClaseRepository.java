@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+
+import java.util.Optional;
 
 import java.time.LocalTime;
 
@@ -76,5 +80,29 @@ public interface ClaseRepository
 
             @Param("estado")
             EstadoClase estado
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        SELECT c
+        FROM Clase c
+        WHERE c.idClase = :idClase
+        """)
+    Optional<Clase> buscarPorIdConBloqueo(
+            @Param("idClase")
+            String idClase
+    );
+
+    @EntityGraph(attributePaths = {
+            "cancha",
+            "cancha.sede",
+            "cancha.sede.distrito",
+            "entrenador"
+    })
+    List<Clase>
+    findByEstadoAndFechaClaseGreaterThanEqualAndFechaClaseLessThanOrderByFechaClaseAscHoraInicioAsc(
+            EstadoClase estado,
+            LocalDate fechaInicio,
+            LocalDate fechaFin
     );
 }
