@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.infinityfutbol.entity.CuentaCredito;
+import com.infinityfutbol.repository.CuentaCreditoRepository;
 
 import java.util.UUID;
 
@@ -29,18 +31,21 @@ public class RegistroService {
     private final RolRepository rolRepository;
     private final UsuarioRolRepository usuarioRolRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CuentaCreditoRepository cuentaCreditoRepository;
 
     public RegistroService(
             UsuarioRepository usuarioRepository,
             AlumnoRepository alumnoRepository,
             RolRepository rolRepository,
             UsuarioRolRepository usuarioRolRepository,
+            CuentaCreditoRepository cuentaCreditoRepository,
             PasswordEncoder passwordEncoder
     ) {
         this.usuarioRepository = usuarioRepository;
         this.alumnoRepository = alumnoRepository;
         this.rolRepository = rolRepository;
         this.usuarioRolRepository = usuarioRolRepository;
+        this.cuentaCreditoRepository = cuentaCreditoRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -87,6 +92,16 @@ public class RegistroService {
 
         alumnoRepository.save(alumno);
 
+        CuentaCredito cuentaCredito =
+                crearCuentaCredito(
+                        alumno,
+                        codigoGenerado
+                );
+
+        cuentaCreditoRepository.save(
+                cuentaCredito
+        );
+
         UsuarioRol usuarioRol = crearUsuarioRol(
                 usuario,
                 rolUsuario
@@ -101,6 +116,23 @@ public class RegistroService {
                 usuario.getCorreo(),
                 "El usuario fue registrado correctamente"
         );
+    }
+
+    private CuentaCredito crearCuentaCredito(
+            Alumno alumno,
+            String codigoGenerado
+    ) {
+        CuentaCredito cuentaCredito =
+                new CuentaCredito();
+
+        cuentaCredito.setIdCuentaCredito(
+                "CTC-" + codigoGenerado
+        );
+
+        cuentaCredito.setAlumno(alumno);
+        cuentaCredito.setSaldoActual(0);
+
+        return cuentaCredito;
     }
 
     private Usuario crearUsuario(

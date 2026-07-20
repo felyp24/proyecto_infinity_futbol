@@ -122,6 +122,15 @@ public class SecurityConfig {
                         )
                         .hasRole("ADMINISTRADOR")
 
+                        .requestMatchers(
+                                "/coordinador/**",
+                                "/api/coordinador/**"
+                        )
+                        .hasAnyRole(
+                                "COORDINADOR",
+                                "ADMINISTRADOR"
+                        )
+
                         /*
                          * El resto necesita autenticación.
                          */
