@@ -87,4 +87,41 @@ public interface ReservaRepository
             @Param("horaActual")
             LocalTime horaActual
     );
+
+    @EntityGraph(attributePaths = {
+            "clase",
+            "clase.cancha",
+            "clase.cancha.sede",
+            "clase.cancha.sede.distrito",
+            "clase.entrenador"
+    })
+    @Query("""
+        SELECT r
+        FROM Reserva r
+        WHERE r.alumno.usuario.idUsuario = :idUsuario
+          AND r.estado = :estado
+          AND (
+                r.clase.fechaClase > :fechaActual
+                OR (
+                    r.clase.fechaClase = :fechaActual
+                    AND r.clase.horaFin > :horaActual
+                )
+          )
+        ORDER BY
+            r.clase.fechaClase ASC,
+            r.clase.horaInicio ASC
+        """)
+    List<Reserva> listarReservasProximas(
+            @Param("idUsuario")
+            String idUsuario,
+
+            @Param("estado")
+            EstadoReserva estado,
+
+            @Param("fechaActual")
+            LocalDate fechaActual,
+
+            @Param("horaActual")
+            LocalTime horaActual
+    );
 }

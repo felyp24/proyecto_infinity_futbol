@@ -433,6 +433,161 @@ body {
     border: 1px solid #ffecb5;
     border-radius: 8px;
 }
+/*
+   PRÓXIMAS RESERVAS
+*/
+
+.panel-reservas {
+    padding: 24px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e3e7ea;
+    border-radius: 12px;
+}
+
+.tarjeta-reserva {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    padding: 18px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e1e5e8;
+    border-left: 5px solid #0d6efd;
+    border-radius: 10px;
+
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.tarjeta-reserva:hover {
+    transform: translateY(-2px);
+    border-color: #b8c2cc;
+    border-left-color: #0d6efd;
+}
+
+.encabezado-reserva {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+.titulo-reserva {
+    margin: 0;
+
+    color: #143d2b;
+
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.estado-reserva {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    background-color: #cfe2ff;
+    color: #084298;
+
+    border-radius: 20px;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.fecha-reserva-clase {
+    margin-bottom: 14px;
+
+    color: #212529;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.detalles-reserva {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+
+    margin-bottom: 14px;
+}
+
+.detalle-reserva {
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px;
+
+    background-color: #f6f7f8;
+
+    border-radius: 7px;
+}
+
+.detalle-reserva-etiqueta {
+    margin-bottom: 2px;
+
+    color: #6c757d;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.detalle-reserva-valor {
+    color: #212529;
+
+    font-size: 0.9rem;
+}
+
+.pie-reserva {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 12px;
+
+    border-top: 1px solid #eceff1;
+}
+
+.creditos-reserva {
+    color: #495057;
+    font-size: 0.85rem;
+}
+
+.estado-reservas {
+    padding: 28px;
+
+    color: #6c757d;
+    text-align: center;
+
+    background-color: #f8f9fa;
+
+    border: 1px dashed #ced4da;
+    border-radius: 9px;
+}
+
+.panel-reservas {
+    padding: 15px;
+}
+
+.detalles-reserva {
+    grid-template-columns: 1fr;
+}
+
+.encabezado-reserva {
+    flex-direction: column;
+}
 
 
 /*

@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.infinityfutbol.dto.response.ReservaProximaResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/inicio/reservas")
@@ -37,6 +40,16 @@ public class ReservaClienteController {
         return reservaService.reservarClase(
                 usuarioAutenticado.getIdUsuario(),
                 idClase
+        );
+    }
+
+    @GetMapping
+    public List<ReservaProximaResponse> listarReservasProximas(
+            @AuthenticationPrincipal
+            CustomUserDetails usuarioAutenticado
+    ) {
+        return reservaService.listarReservasProximas(
+                usuarioAutenticado.getIdUsuario()
         );
     }
 }

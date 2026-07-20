@@ -19,10 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.infinityfutbol.dto.response.ReservaProximaResponse;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class ReservaService {
@@ -358,5 +361,59 @@ public class ReservaService {
                 .replace("-", "")
                 .substring(0, 20)
                 .toUpperCase();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservaProximaResponse> listarReservasProximas(
+            String idUsuario
+    ) {
+        return reservaRepository
+                .listarReservasProximas(
+                        idUsuario,
+                        EstadoReserva.CONFIRMADA,
+                        LocalDate.now(),
+                        LocalTime.now()
+                )
+                .stream()
+                .map(this::convertirReservaProxima)
+                .toList();
+    }
+
+    private ReservaProximaResponse convertirReservaProxima(
+            Reserva reserva
+    ) {
+        Clase clase = reserva.getClase();
+
+        String nombreEntrenador =
+                clase.getEntrenador().getNombres()
+                        + " "
+                        + clase.getEntrenador().getApellidos();
+
+        return new ReservaProximaResponse(
+                reserva.getIdReserva(),
+                clase.getIdClase(),
+                clase.getTitulo(),
+
+                clase.getFechaClase(),
+                clase.getHoraInicio(),
+                clase.getHoraFin(),
+
+                clase.getCancha()
+                        .getSede()
+                        .getNombre(),
+
+                clase.getCancha()
+                        .getSede()
+                        .getDistrito()
+                        .getNombre(),
+
+                clase.getCancha()
+                        .getNumeroCancha(),
+
+                nombreEntrenador,
+
+                reserva.getCreditosUsados(),
+                reserva.getEstado()
+        );
     }
 }

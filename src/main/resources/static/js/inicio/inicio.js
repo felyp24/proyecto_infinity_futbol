@@ -28,6 +28,11 @@ const btnActualizarCalendario =
 const btnReservar =
     document.getElementById("btnReservar");
 
+const listaReservasProximas =
+    document.getElementById(
+        "listaReservasProximas"
+    );
+
 async function iniciarPagina() {
     modalClase = new bootstrap.Modal(
         document.getElementById("modalClase")
@@ -43,7 +48,10 @@ async function iniciarPagina() {
         reservarClase
     );
 
-    await cargarResumen();
+    await Promise.all([
+        cargarResumen(),
+        cargarReservasProximas()
+    ]);
 
     inicializarCalendario();
 }
@@ -486,7 +494,10 @@ async function reservarClase() {
             "success"
         );
 
-        await cargarResumen();
+        await Promise.all([
+            cargarResumen(),
+            cargarReservasProximas()
+        ]);
 
         calendario.refetchEvents();
 
@@ -524,9 +535,18 @@ async function actualizarCalendario() {
         "Actualizando...";
 
     try {
-        await cargarResumen();
+        await Promise.all([
+            cargarResumen(),
+            cargarReservasProximas()
+        ]);
 
         calendario.refetchEvents();
+
+    } catch (error) {
+        mostrarMensajePagina(
+            error.message,
+            "danger"
+        );
 
     } finally {
         btnActualizarCalendario.disabled = false;
@@ -622,4 +642,230 @@ async function obtenerMensajeError(response) {
     } catch {
         return contenido;
     }
+}
+
+
+async function cargarReservasProximas() {
+    listaReservasProximas.innerHTML = `
+        <div class="col-12">
+            <div class="estado-reservas">
+                Cargando reservas...
+            </div>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(
+            "/api/inicio/reservas",
+            {
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(response)
+            );
+        }
+
+        const reservas =
+            await response.json();
+
+        mostrarReservasProximas(reservas);
+
+    } catch (error) {
+        console.error(
+            "Error al cargar reservas:",
+            error
+        );
+
+        listaReservasProximas.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger mb-0">
+                    ${escaparHtml(error.message)}
+                </div>
+            </div>
+        `;
+    }
+}
+
+
+function mostrarReservasProximas(reservas) {
+    if (!reservas || reservas.length === 0) {
+        listaReservasProximas.innerHTML = `
+            <div class="col-12">
+                <div class="estado-reservas">
+                    Todavía no tienes reservas próximas.
+                    Selecciona una clase disponible en el calendario.
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    listaReservasProximas.innerHTML =
+        reservas
+            .map(reserva => `
+                <div class="col-lg-6">
+
+                    <article class="tarjeta-reserva">
+
+                        <div class="encabezado-reserva">
+
+                            <h3 class="titulo-reserva">
+                                ${escaparHtml(reserva.titulo)}
+                            </h3>
+
+                            <span class="estado-reserva">
+                                Confirmada
+                            </span>
+
+                        </div>
+
+                        <div class="fecha-reserva-clase">
+                            ${formatearFechaISO(
+                                reserva.fechaClase
+                            )}
+                            ·
+                            ${formatearHoraTexto(
+                                reserva.horaInicio
+                            )}
+                            -
+                            ${formatearHoraTexto(
+                                reserva.horaFin
+                            )}
+                        </div>
+
+                        <div class="detalles-reserva">
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Entrenador
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.nombreEntrenador
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Sede
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.nombreSede
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Distrito
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.distrito
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Cancha
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    Cancha ${reserva.numeroCancha}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="pie-reserva">
+
+                            <span class="creditos-reserva">
+                                Costo:
+                                ${reserva.creditosUsados}
+                                ${
+                                    reserva.creditosUsados === 1
+                                        ? "crédito"
+                                        : "créditos"
+                                }
+                            </span>
+
+                            <span class="text-muted small">
+                                ${escaparHtml(reserva.estado)}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                </div>
+            `)
+            .join("");
+}
+
+
+function formatearFechaISO(fechaTexto) {
+    if (!fechaTexto) {
+        return "-";
+    }
+
+    const partes =
+        fechaTexto.split("-");
+
+    if (partes.length !== 3) {
+        return fechaTexto;
+    }
+
+    const fecha = new Date(
+        Number(partes[0]),
+        Number(partes[1]) - 1,
+        Number(partes[2])
+    );
+
+    return new Intl.DateTimeFormat(
+        "es-PE",
+        {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    ).format(fecha);
+}
+
+
+function formatearHoraTexto(hora) {
+    if (!hora) {
+        return "-";
+    }
+
+    return hora.substring(0, 5);
+}
+
+
+function escaparHtml(valor) {
+    const elemento =
+        document.createElement("div");
+
+    elemento.textContent =
+        valor ?? "";
+
+    return elemento.innerHTML;
 }
