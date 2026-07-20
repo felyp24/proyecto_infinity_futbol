@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.infinityfutbol.dto.response.ReservaProximaResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/inicio/reservas")
@@ -50,6 +51,20 @@ public class ReservaClienteController {
     ) {
         return reservaService.listarReservasProximas(
                 usuarioAutenticado.getIdUsuario()
+        );
+    }
+
+    @DeleteMapping("/{idReserva}")
+    public ReservaResponse cancelarReserva(
+            @AuthenticationPrincipal
+            CustomUserDetails usuarioAutenticado,
+
+            @PathVariable
+            String idReserva
+    ) {
+        return reservaService.cancelarReserva(
+                usuarioAutenticado.getIdUsuario(),
+                idReserva
         );
     }
 }

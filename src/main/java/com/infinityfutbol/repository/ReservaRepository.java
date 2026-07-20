@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 public interface ReservaRepository
@@ -123,5 +124,20 @@ public interface ReservaRepository
 
             @Param("horaActual")
             LocalTime horaActual
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        SELECT r
+        FROM Reserva r
+        WHERE r.idReserva = :idReserva
+          AND r.alumno.usuario.idUsuario = :idUsuario
+        """)
+    Optional<Reserva> buscarReservaClienteConBloqueo(
+            @Param("idReserva")
+            String idReserva,
+
+            @Param("idUsuario")
+            String idUsuario
     );
 }

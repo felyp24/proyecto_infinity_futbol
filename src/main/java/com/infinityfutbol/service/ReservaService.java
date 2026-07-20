@@ -416,4 +416,175 @@ public class ReservaService {
                 reserva.getEstado()
         );
     }
+
+    @Transactional
+    public ReservaResponse cancelarReserva(
+            String idUsuario,
+            String idReserva
+    ) {
+        Reserva reserva =
+                reservaRepository
+                        .buscarReservaClienteConBloqueo(
+                                idReserva,
+                                idUsuario
+                        )
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "La reserva no existe o no pertenece al usuario"
+                                )
+                        );
+
+        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La reserva ya se encuentra cancelada"
+            );
+        }
+
+        Clase clase =
+                claseRepository
+                        .buscarPorIdConBloqueo(
+                                reserva.getClase().getIdClase()
+                        )
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "La clase asociada ya no existe"
+                                )
+                        );
+
+        validarCancelacion(clase);
+
+        CuentaCredito cuentaCredito =
+                cuentaCreditoRepository
+                        .buscarPorAlumnoConBloqueo(
+                                reserva.getAlumno().getIdAlumno()
+                        )
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.CONFLICT,
+                                        "El alumno no tiene una cuenta de créditos"
+                                )
+                        );
+
+        int creditosDevueltos =
+                reserva.getCreditosUsados() != null
+                        ? reserva.getCreditosUsados()
+                        : COSTO_RESERVA;
+
+        reserva.setEstado(
+                EstadoReserva.CANCELADA
+        );
+
+        cuentaCredito.setSaldoActual(
+                cuentaCredito.getSaldoActual()
+                        + creditosDevueltos
+        );
+
+        clase.setCupoDisponible(
+                clase.getCupoDisponible() + 1
+        );
+
+        reservaRepository.save(reserva);
+        cuentaCreditoRepository.save(cuentaCredito);
+        claseRepository.save(clase);
+
+        MovimientoCredito movimiento =
+                crearMovimientoDevolucion(
+                        cuentaCredito,
+                        reserva,
+                        clase,
+                        creditosDevueltos
+                );
+
+        movimientoCreditoRepository.save(movimiento);
+
+        return convertirResponse(
+                reserva,
+                cuentaCredito,
+                clase
+        );
+    }
+
+    private void validarCancelacion(
+            Clase clase
+    ) {
+        LocalDateTime inicioClase =
+                LocalDateTime.of(
+                        clase.getFechaClase(),
+                        clase.getHoraInicio()
+                );
+
+        if (!inicioClase.isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se puede cancelar una reserva después de iniciada la clase"
+            );
+        }
+
+        if (
+                clase.getCupoDisponible() == null
+                        || clase.getCupoMaximo() == null
+        ) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La información de cupos de la clase no es válida"
+            );
+        }
+
+        if (
+                clase.getCupoDisponible()
+                        >= clase.getCupoMaximo()
+        ) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se pudo restablecer el cupo de la clase"
+            );
+        }
+    }
+
+    private MovimientoCredito crearMovimientoDevolucion(
+            CuentaCredito cuentaCredito,
+            Reserva reserva,
+            Clase clase,
+            int creditosDevueltos
+    ) {
+        MovimientoCredito movimiento =
+                new MovimientoCredito();
+
+        movimiento.setIdMovimientoCredito(
+                generarIdMovimiento()
+        );
+
+        movimiento.setCuentaCredito(
+                cuentaCredito
+        );
+
+        movimiento.setReserva(
+                reserva
+        );
+
+        movimiento.setTipoMovimiento(
+                TipoMovimientoCredito.DEVOLUCION
+        );
+
+        movimiento.setCantidad(
+                creditosDevueltos
+        );
+
+        movimiento.setDescripcion(
+                "Devolución de "
+                        + creditosDevueltos
+                        + (
+                        creditosDevueltos == 1
+                                ? " crédito"
+                                : " créditos"
+                )
+                        + " por cancelación de la clase: "
+                        + clase.getTitulo()
+        );
+
+        return movimiento;
+    }
 }

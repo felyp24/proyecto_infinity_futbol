@@ -48,6 +48,11 @@ async function iniciarPagina() {
         reservarClase
     );
 
+    listaReservasProximas.addEventListener(
+        "click",
+        manejarAccionReserva
+    );
+
     await Promise.all([
         cargarResumen(),
         cargarReservasProximas()
@@ -570,6 +575,11 @@ function mostrarMensajePagina(texto, tipo) {
 
     mensajePagina.className =
         `alert alert-${tipo}`;
+
+    mensajePagina.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
 }
 
 function mostrarMensajeModal(texto, tipo) {
@@ -807,9 +817,19 @@ function mostrarReservasProximas(reservas) {
                                 }
                             </span>
 
-                            <span class="text-muted small">
-                                ${escaparHtml(reserva.estado)}
-                            </span>
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm btn-cancelar-reserva"
+                                data-action="cancelar-reserva"
+                                data-id-reserva="${escaparHtml(
+                                    reserva.idReserva
+                                )}"
+                                data-titulo="${escaparHtml(
+                                    reserva.titulo
+                                )}"
+                            >
+                                Cancelar reserva
+                            </button>
 
                         </div>
 
@@ -868,4 +888,115 @@ function escaparHtml(valor) {
         valor ?? "";
 
     return elemento.innerHTML;
+}
+
+function manejarAccionReserva(event) {
+    const botonCancelar =
+        event.target.closest(
+            '[data-action="cancelar-reserva"]'
+        );
+
+    if (!botonCancelar) {
+        return;
+    }
+
+    const idReserva =
+        botonCancelar.dataset.idReserva;
+
+    const titulo =
+        botonCancelar.dataset.titulo;
+
+    cancelarReserva(
+        idReserva,
+        titulo,
+        botonCancelar
+    );
+}
+
+async function cancelarReserva(
+    idReserva,
+    titulo,
+    boton
+) {
+    if (!idReserva) {
+        mostrarMensajePagina(
+            "No se pudo identificar la reserva.",
+            "danger"
+        );
+
+        return;
+    }
+
+    const confirmado = window.confirm(
+        `¿Deseas cancelar la reserva de "${titulo}"? `
+        + "El crédito utilizado será devuelto a tu cuenta."
+    );
+
+    if (!confirmado) {
+        return;
+    }
+
+    const textoOriginal =
+        boton.textContent;
+
+    boton.disabled = true;
+    boton.textContent =
+        "Cancelando...";
+
+    try {
+        const csrf =
+            await obtenerCsrf();
+
+        const response = await fetch(
+            `/api/inicio/reservas/${idReserva}`,
+            {
+                method: "DELETE",
+
+                credentials: "same-origin",
+
+                headers: {
+                    [csrf.headerName]:
+                        csrf.token
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(response)
+            );
+        }
+
+        const reservaCancelada =
+            await response.json();
+
+        saldoActual =
+            reservaCancelada.saldoCreditos;
+
+        saldoCreditos.textContent =
+            saldoActual;
+
+        mostrarMensajePagina(
+            "La reserva fue cancelada correctamente. "
+            + "El crédito fue devuelto a tu cuenta.",
+            "success"
+        );
+
+        await Promise.all([
+            cargarResumen(),
+            cargarReservasProximas()
+        ]);
+
+        calendario.refetchEvents();
+
+    } catch (error) {
+        mostrarMensajePagina(
+            error.message,
+            "danger"
+        );
+
+        boton.disabled = false;
+        boton.textContent =
+            textoOriginal;
+    }
 }
