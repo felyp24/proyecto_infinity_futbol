@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.infinityfutbol.dto.request.ActualizarProgramacionClaseRequest;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -55,5 +58,20 @@ public class ClaseCoordinadorController {
     @GetMapping
     public List<ClaseResponse> listarClases() {
         return claseService.listarClasesProgramadas();
+    }
+
+    @PutMapping("/{idClase}")
+    public ClaseResponse actualizarProgramacion(
+            @PathVariable
+            String idClase,
+
+            @Valid
+            @RequestBody
+            ActualizarProgramacionClaseRequest request
+    ) {
+        return claseService.actualizarProgramacion(
+                idClase,
+                request
+        );
     }
 }

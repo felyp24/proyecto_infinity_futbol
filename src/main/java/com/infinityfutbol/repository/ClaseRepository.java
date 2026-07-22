@@ -105,4 +105,64 @@ public interface ClaseRepository
             LocalDate fechaInicio,
             LocalDate fechaFin
     );
+
+    @Query("""
+        SELECT COUNT(c) > 0
+        FROM Clase c
+        WHERE c.idClase <> :idClase
+          AND c.fechaClase = :fechaClase
+          AND c.cancha.idCancha = :idCancha
+          AND c.estado = :estado
+          AND c.horaInicio < :horaFin
+          AND c.horaFin > :horaInicio
+        """)
+    boolean existeCruceCanchaAlEditar(
+            @Param("idClase")
+            String idClase,
+
+            @Param("fechaClase")
+            LocalDate fechaClase,
+
+            @Param("horaInicio")
+            LocalTime horaInicio,
+
+            @Param("horaFin")
+            LocalTime horaFin,
+
+            @Param("idCancha")
+            String idCancha,
+
+            @Param("estado")
+            EstadoClase estado
+    );
+
+    @Query("""
+        SELECT COUNT(c) > 0
+        FROM Clase c
+        WHERE c.idClase <> :idClase
+          AND c.fechaClase = :fechaClase
+          AND c.entrenador.idEntrenador = :idEntrenador
+          AND c.estado = :estado
+          AND c.horaInicio < :horaFin
+          AND c.horaFin > :horaInicio
+        """)
+    boolean existeCruceEntrenadorAlEditar(
+            @Param("idClase")
+            String idClase,
+
+            @Param("fechaClase")
+            LocalDate fechaClase,
+
+            @Param("horaInicio")
+            LocalTime horaInicio,
+
+            @Param("horaFin")
+            LocalTime horaFin,
+
+            @Param("idEntrenador")
+            String idEntrenador,
+
+            @Param("estado")
+            EstadoClase estado
+    );
 }

@@ -17,11 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.util.Set;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
+import com.infinityfutbol.dto.request.ActualizarProgramacionClaseRequest;
+import java.time.LocalDateTime;
 
 @Service
 public class ClaseService {
@@ -29,15 +31,20 @@ public class ClaseService {
     private final ClaseRepository claseRepository;
     private final CanchaRepository canchaRepository;
     private final EntrenadorRepository entrenadorRepository;
+    private final NotificacionService notificacionService;
+    private static final Set<String> TITULOS_PERMITIDOS =
+            Set.of(
+                    "Clase de arqueros",
+                    "Entrenamiento",
+                    "Futbol Total"
+            );
 
-    public ClaseService(
-            ClaseRepository claseRepository,
-            CanchaRepository canchaRepository,
-            EntrenadorRepository entrenadorRepository
-    ) {
+
+    public ClaseService(ClaseRepository claseRepository, CanchaRepository canchaRepository, EntrenadorRepository entrenadorRepository, NotificacionService notificacionService) {
         this.claseRepository = claseRepository;
         this.canchaRepository = canchaRepository;
         this.entrenadorRepository = entrenadorRepository;
+        this.notificacionService = notificacionService;
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +73,8 @@ public class ClaseService {
     public ClaseResponse crearClase(
             CrearClaseRequest request
     ) {
+        validarTitulo(request.titulo());
+
         validarHorario(request);
 
         Cancha cancha = buscarCanchaDisponible(
@@ -332,5 +341,184 @@ public class ClaseService {
                 .stream()
                 .map(this::convertirClaseResponse)
                 .toList();
+    }
+    private void validarTitulo(
+            String titulo
+    ) {
+        if (
+                titulo == null
+                        || !TITULOS_PERMITIDOS.contains(
+                        titulo.trim()
+                )
+        ) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Debe seleccionar un tipo de clase válido"
+            );
+        }
+    }
+
+    @Transactional
+    public ClaseResponse actualizarProgramacion(
+            String idClase,
+            ActualizarProgramacionClaseRequest request
+    ) {
+        Clase clase = claseRepository
+                .buscarPorIdConBloqueo(idClase)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "La clase solicitada no existe"
+                        )
+                );
+
+        validarClaseEditable(clase);
+
+        validarNuevoHorario(
+                request.fechaClase(),
+                request.horaInicio(),
+                request.horaFin()
+        );
+
+        Cancha nuevaCancha =
+                buscarCanchaDisponible(
+                        request.idCancha()
+                );
+
+        validarCruceCanchaAlEditar(
+                clase,
+                request,
+                nuevaCancha
+        );
+
+        validarCruceEntrenadorAlEditar(
+                clase,
+                request
+        );
+
+        clase.setFechaClase(
+                request.fechaClase()
+        );
+
+        clase.setHoraInicio(
+                request.horaInicio()
+        );
+
+        clase.setHoraFin(
+                request.horaFin()
+        );
+
+        clase.setCancha(
+                nuevaCancha
+        );
+
+        Clase claseActualizada =
+                claseRepository.save(clase);
+
+        notificacionService.reprogramarRecordatoriosClase(
+                claseActualizada
+        );
+
+        return convertirClaseResponse(
+                claseActualizada
+        );
+    }
+
+    private void validarClaseEditable(
+            Clase clase
+    ) {
+        if (clase.getEstado() != EstadoClase.PROGRAMADA) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Solo se pueden editar clases programadas"
+            );
+        }
+
+        LocalDateTime inicioActual =
+                LocalDateTime.of(
+                        clase.getFechaClase(),
+                        clase.getHoraInicio()
+                );
+
+        if (!inicioActual.isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se puede editar una clase que ya comenzó"
+            );
+        }
+    }
+
+    private void validarNuevoHorario(
+            LocalDate fechaClase,
+            LocalTime horaInicio,
+            LocalTime horaFin
+    ) {
+        if (!horaFin.isAfter(horaInicio)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La hora de finalización debe ser posterior a la hora de inicio"
+            );
+        }
+
+        LocalDateTime nuevoInicio =
+                LocalDateTime.of(
+                        fechaClase,
+                        horaInicio
+                );
+
+        if (!nuevoInicio.isAfter(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El nuevo horario debe ser posterior a la fecha y hora actual"
+            );
+        }
+    }
+
+    private void validarCruceCanchaAlEditar(
+            Clase clase,
+            ActualizarProgramacionClaseRequest request,
+            Cancha cancha
+    ) {
+        boolean existeCruce =
+                claseRepository
+                        .existeCruceCanchaAlEditar(
+                                clase.getIdClase(),
+                                request.fechaClase(),
+                                request.horaInicio(),
+                                request.horaFin(),
+                                cancha.getIdCancha(),
+                                EstadoClase.PROGRAMADA
+                        );
+
+        if (existeCruce) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "La cancha ya tiene otra clase programada en ese horario"
+            );
+        }
+    }
+
+    private void validarCruceEntrenadorAlEditar(
+            Clase clase,
+            ActualizarProgramacionClaseRequest request
+    ) {
+        boolean existeCruce =
+                claseRepository
+                        .existeCruceEntrenadorAlEditar(
+                                clase.getIdClase(),
+                                request.fechaClase(),
+                                request.horaInicio(),
+                                request.horaFin(),
+                                clase.getEntrenador()
+                                        .getIdEntrenador(),
+                                EstadoClase.PROGRAMADA
+                        );
+
+        if (existeCruce) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El entrenador ya tiene otra clase programada en ese horario"
+            );
+        }
     }
 }

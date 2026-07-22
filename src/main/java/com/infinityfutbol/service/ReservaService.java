@@ -37,13 +37,15 @@ public class ReservaService {
     private final CuentaCreditoRepository cuentaCreditoRepository;
     private final ReservaRepository reservaRepository;
     private final MovimientoCreditoRepository movimientoCreditoRepository;
+    private final NotificacionService notificacionService;
 
     public ReservaService(
             AlumnoRepository alumnoRepository,
             ClaseRepository claseRepository,
             CuentaCreditoRepository cuentaCreditoRepository,
             ReservaRepository reservaRepository,
-            MovimientoCreditoRepository movimientoCreditoRepository
+            MovimientoCreditoRepository movimientoCreditoRepository,
+            NotificacionService notificacionService
     ) {
         this.alumnoRepository = alumnoRepository;
         this.claseRepository = claseRepository;
@@ -51,6 +53,8 @@ public class ReservaService {
         this.reservaRepository = reservaRepository;
         this.movimientoCreditoRepository =
                 movimientoCreditoRepository;
+        this.notificacionService =
+                notificacionService;
     }
 
     @Transactional
@@ -137,6 +141,10 @@ public class ReservaService {
                 );
 
         movimientoCreditoRepository.save(movimiento);
+
+        notificacionService.programarRecordatorioClase(
+                reservaGuardada
+        );
 
         return convertirResponse(
                 reservaGuardada,
@@ -500,6 +508,9 @@ public class ReservaService {
 
         movimientoCreditoRepository.save(movimiento);
 
+        notificacionService.cancelarRecordatorioClase(
+                reserva
+        );
         return convertirResponse(
                 reserva,
                 cuentaCredito,

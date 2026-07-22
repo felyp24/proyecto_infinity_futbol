@@ -24,17 +24,50 @@ const tablaClases =
 const mensaje =
     document.getElementById("mensaje");
 
+const formEditarClase =
+    document.getElementById("formEditarClase");
+
+const btnGuardarEdicion =
+    document.getElementById("btnGuardarEdicion");
+
+const selectEditarCancha =
+    document.getElementById("editarIdCancha");
+
+const mensajeEdicion =
+    document.getElementById("mensajeEdicion");
+
+let clasesCargadas = [];
+let canchasCargadas = [];
+let modalEditarClase;
+
 async function iniciarPagina() {
     establecerFechaMinima();
+
+    modalEditarClase =
+        new bootstrap.Modal(
+            document.getElementById(
+                "modalEditarClase"
+            )
+        );
 
     formCrearClase.addEventListener(
         "submit",
         registrarClase
     );
 
+    formEditarClase.addEventListener(
+        "submit",
+        guardarEdicionClase
+    );
+
     btnActualizar.addEventListener(
         "click",
         cargarClases
+    );
+
+    tablaClases.addEventListener(
+        "click",
+        manejarClickTabla
     );
 
     await Promise.all([
@@ -46,9 +79,7 @@ async function iniciarPagina() {
 
 function establecerFechaMinima() {
     const fechaActual =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+        obtenerFechaLocalActual();
 
     document
         .getElementById("fechaClase")
@@ -56,6 +87,29 @@ function establecerFechaMinima() {
             "min",
             fechaActual
         );
+
+    document
+        .getElementById("editarFechaClase")
+        .setAttribute(
+            "min",
+            fechaActual
+        );
+}
+
+function obtenerFechaLocalActual() {
+    const fecha = new Date();
+
+    const anio = fecha.getFullYear();
+
+    const mes = String(
+        fecha.getMonth() + 1
+    ).padStart(2, "0");
+
+    const dia = String(
+        fecha.getDate()
+    ).padStart(2, "0");
+
+    return `${anio}-${mes}-${dia}`;
 }
 
 async function cargarCanchas() {
@@ -73,29 +127,18 @@ async function cargarCanchas() {
             );
         }
 
-        const canchas = await response.json();
+        canchasCargadas =
+            await response.json();
 
-        selectCancha.innerHTML =
-            '<option value="">Seleccione una cancha</option>';
+        llenarSelectCanchas(
+            selectCancha,
+            "Seleccione una cancha"
+        );
 
-        canchas.forEach(cancha => {
-            const option =
-                document.createElement("option");
-
-            option.value = cancha.idCancha;
-
-            option.textContent =
-                `${cancha.nombreSede} - ` +
-                `Cancha ${cancha.numeroCancha} - ` +
-                `${cancha.tipoSuperficie}`;
-
-            selectCancha.appendChild(option);
-        });
-
-        if (canchas.length === 0) {
-            selectCancha.innerHTML =
-                '<option value="">No existen canchas disponibles</option>';
-        }
+        llenarSelectCanchas(
+            selectEditarCancha,
+            "Seleccione una cancha"
+        );
 
     } catch (error) {
         mostrarMensaje(
@@ -161,7 +204,7 @@ async function cargarEntrenadores() {
 async function cargarClases() {
     tablaClases.innerHTML = `
         <tr>
-            <td colspan="7"
+            <td colspan="8"
                 class="text-center text-muted">
                 Cargando clases...
             </td>
@@ -183,13 +226,14 @@ async function cargarClases() {
         }
 
         const clases = await response.json();
+        clasesCargadas = clases;
 
         mostrarClases(clases);
 
     } catch (error) {
         tablaClases.innerHTML = `
             <tr>
-                <td colspan="7"
+                <td colspan="8"
                     class="text-center text-danger">
                     ${escaparHtml(error.message)}
                 </td>
@@ -202,7 +246,7 @@ function mostrarClases(clases) {
     if (clases.length === 0) {
         tablaClases.innerHTML = `
             <tr>
-                <td colspan="7"
+                <td colspan="8"
                     class="text-center text-muted">
                     No existen clases programadas.
                 </td>
@@ -217,25 +261,35 @@ function mostrarClases(clases) {
             .map(clase => `
                 <tr>
                     <td>
-                        ${formatearFecha(clase.fechaClase)}
+                        ${formatearFecha(
+                            clase.fechaClase
+                        )}
                     </td>
 
                     <td>
-                        ${formatearHora(clase.horaInicio)}
+                        ${formatearHora(
+                            clase.horaInicio
+                        )}
                         -
-                        ${formatearHora(clase.horaFin)}
+                        ${formatearHora(
+                            clase.horaFin
+                        )}
                     </td>
 
                     <td>
                         <strong>
-                            ${escaparHtml(clase.titulo)}
+                            ${escaparHtml(
+                                clase.titulo
+                            )}
                         </strong>
 
                         ${
                             clase.descripcion
                                 ? `
                                     <div class="small text-muted">
-                                        ${escaparHtml(clase.descripcion)}
+                                        ${escaparHtml(
+                                            clase.descripcion
+                                        )}
                                     </div>
                                   `
                                 : ""
@@ -249,9 +303,13 @@ function mostrarClases(clases) {
                     </td>
 
                     <td>
-                        ${escaparHtml(clase.nombreSede)}
+                        ${escaparHtml(
+                            clase.nombreSede
+                        )}
+
                         <div class="small text-muted">
-                            Cancha ${clase.numeroCancha}
+                            Cancha
+                            ${clase.numeroCancha}
                         </div>
                     </td>
 
@@ -263,8 +321,22 @@ function mostrarClases(clases) {
 
                     <td>
                         <span class="badge badge-programada">
-                            ${escaparHtml(clase.estado)}
+                            ${escaparHtml(
+                                clase.estado
+                            )}
                         </span>
+                    </td>
+
+                    <td>
+                        <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm btn-editar-clase"
+                                data-id-clase="${escaparHtml(
+                                    clase.idClase
+                                )}"
+                        >
+                            Editar
+                        </button>
                     </td>
                 </tr>
             `)
@@ -450,4 +522,275 @@ function escaparHtml(valor) {
         valor ?? "";
 
     return elemento.innerHTML;
+}
+
+function llenarSelectCanchas(
+    select,
+    textoInicial
+) {
+    select.innerHTML = "";
+
+    const optionInicial =
+        document.createElement("option");
+
+    optionInicial.value = "";
+    optionInicial.textContent =
+        textoInicial;
+
+    select.appendChild(optionInicial);
+
+    canchasCargadas.forEach(cancha => {
+        const option =
+            document.createElement("option");
+
+        option.value =
+            cancha.idCancha;
+
+        option.textContent =
+            `${cancha.nombreSede} - ` +
+            `Cancha ${cancha.numeroCancha} - ` +
+            `${cancha.tipoSuperficie}`;
+
+        select.appendChild(option);
+    });
+
+    if (canchasCargadas.length === 0) {
+        select.innerHTML =
+            '<option value="">No existen canchas disponibles</option>';
+    }
+}
+
+function manejarClickTabla(event) {
+    const botonEditar =
+        event.target.closest(
+            ".btn-editar-clase"
+        );
+
+    if (!botonEditar) {
+        return;
+    }
+
+    abrirModalEdicion(
+        botonEditar.dataset.idClase
+    );
+}
+
+function abrirModalEdicion(
+    idClase
+) {
+    const clase =
+        clasesCargadas.find(
+            item =>
+                item.idClase === idClase
+        );
+
+    if (!clase) {
+        mostrarMensaje(
+            "No se encontró la clase seleccionada.",
+            "danger"
+        );
+
+        return;
+    }
+
+    limpiarMensajeEdicion();
+
+    document
+        .getElementById("editarIdClase")
+        .value = clase.idClase;
+
+    document
+        .getElementById("editarTituloClase")
+        .textContent = clase.titulo;
+
+    document
+        .getElementById("editarEntrenadorClase")
+        .value = clase.nombreEntrenador;
+
+    document
+        .getElementById("editarFechaClase")
+        .value = clase.fechaClase;
+
+    document
+        .getElementById("editarHoraInicio")
+        .value = formatearHora(
+            clase.horaInicio
+        );
+
+    document
+        .getElementById("editarHoraFin")
+        .value = formatearHora(
+            clase.horaFin
+        );
+
+    asegurarCanchaActualEnSelect(
+        clase
+    );
+
+    selectEditarCancha.value =
+        clase.idCancha;
+
+    modalEditarClase.show();
+}
+
+function asegurarCanchaActualEnSelect(
+    clase
+) {
+    const existeOpcion =
+        Array.from(
+            selectEditarCancha.options
+        ).some(option =>
+            option.value === clase.idCancha
+        );
+
+    if (existeOpcion) {
+        return;
+    }
+
+    const option =
+        document.createElement("option");
+
+    option.value =
+        clase.idCancha;
+
+    option.textContent =
+        `${clase.nombreSede} - ` +
+        `Cancha ${clase.numeroCancha}`;
+
+    selectEditarCancha.appendChild(option);
+}
+
+async function guardarEdicionClase(
+    event
+) {
+    event.preventDefault();
+
+    limpiarMensajeEdicion();
+
+    const idClase =
+        document
+            .getElementById("editarIdClase")
+            .value;
+
+    const request = {
+        fechaClase:
+            document
+                .getElementById(
+                    "editarFechaClase"
+                )
+                .value,
+
+        horaInicio:
+            document
+                .getElementById(
+                    "editarHoraInicio"
+                )
+                .value,
+
+        horaFin:
+            document
+                .getElementById(
+                    "editarHoraFin"
+                )
+                .value,
+
+        idCancha:
+            selectEditarCancha.value
+    };
+
+    if (
+        request.horaFin
+        <= request.horaInicio
+    ) {
+        mostrarMensajeEdicion(
+            "La hora de finalización debe ser posterior a la hora de inicio.",
+            "danger"
+        );
+
+        return;
+    }
+
+    bloquearEdicion(true);
+
+    try {
+        const csrf =
+            await obtenerCsrf();
+
+        const response = await fetch(
+            `/api/coordinador/clases/${idClase}`,
+            {
+                method: "PUT",
+                credentials: "same-origin",
+
+                headers: {
+                    "Content-Type":
+                        "application/json",
+
+                    [csrf.headerName]:
+                        csrf.token
+                },
+
+                body: JSON.stringify(
+                    request
+                )
+            }
+        );
+
+        if (!response.ok) {
+            const error =
+                await obtenerMensajeError(
+                    response
+                );
+
+            throw new Error(error);
+        }
+
+        modalEditarClase.hide();
+
+        mostrarMensaje(
+            "La programación de la clase fue actualizada correctamente.",
+            "success"
+        );
+
+        await cargarClases();
+
+    } catch (error) {
+        mostrarMensajeEdicion(
+            error.message,
+            "danger"
+        );
+
+    } finally {
+        bloquearEdicion(false);
+    }
+}
+
+function bloquearEdicion(
+    bloquear
+) {
+    btnGuardarEdicion.disabled =
+        bloquear;
+
+    btnGuardarEdicion.textContent =
+        bloquear
+            ? "Guardando..."
+            : "Guardar cambios";
+}
+
+function mostrarMensajeEdicion(
+    texto,
+    tipo
+) {
+    mensajeEdicion.textContent =
+        texto;
+
+    mensajeEdicion.className =
+        `alert alert-${tipo}`;
+}
+
+function limpiarMensajeEdicion() {
+    mensajeEdicion.textContent = "";
+
+    mensajeEdicion.className =
+        "alert d-none";
 }

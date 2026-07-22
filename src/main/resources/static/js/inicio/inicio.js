@@ -32,7 +32,20 @@ const listaReservasProximas =
     document.getElementById(
         "listaReservasProximas"
     );
+const contadorNotificaciones =
+    document.getElementById(
+        "contadorNotificaciones"
+    );
 
+const listaNotificaciones =
+    document.getElementById(
+        "listaNotificaciones"
+    );
+
+const btnActualizarNotificaciones =
+    document.getElementById(
+        "btnActualizarNotificaciones"
+    );
 async function iniciarPagina() {
     modalClase = new bootstrap.Modal(
         document.getElementById("modalClase")
@@ -53,12 +66,28 @@ async function iniciarPagina() {
         manejarAccionReserva
     );
 
+    listaNotificaciones.addEventListener(
+        "click",
+        manejarClickNotificacion
+    );
+
+    btnActualizarNotificaciones.addEventListener(
+        "click",
+        cargarNotificaciones
+    );
+
     await Promise.all([
         cargarResumen(),
-        cargarReservasProximas()
+        cargarReservasProximas(),
+        cargarNotificaciones()
     ]);
 
     inicializarCalendario();
+
+    setInterval(
+        cargarNotificaciones,
+        60000
+    );
 }
 
 async function cargarResumen() {
@@ -999,4 +1028,238 @@ async function cancelarReserva(
         boton.textContent =
             textoOriginal;
     }
+}
+
+async function cargarNotificaciones() {
+    try {
+        const response = await fetch(
+            "/api/inicio/notificaciones",
+            {
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(response)
+            );
+        }
+
+        const resultado =
+            await response.json();
+
+        actualizarContadorNotificaciones(
+            resultado.noLeidas ?? 0
+        );
+
+        mostrarNotificaciones(
+            resultado.notificaciones ?? []
+        );
+
+    } catch (error) {
+        listaNotificaciones.innerHTML = `
+            <div class="estado-notificaciones text-danger">
+                ${escaparHtmlNotificacion(
+                    error.message
+                )}
+            </div>
+        `;
+    }
+}
+
+function actualizarContadorNotificaciones(
+    cantidad
+) {
+    contadorNotificaciones.textContent =
+        cantidad > 99
+            ? "99+"
+            : String(cantidad);
+
+    contadorNotificaciones.classList.toggle(
+        "d-none",
+        cantidad <= 0
+    );
+}
+
+function mostrarNotificaciones(
+    notificaciones
+) {
+    if (notificaciones.length === 0) {
+        listaNotificaciones.innerHTML = `
+            <div class="estado-notificaciones">
+                No tienes notificaciones.
+            </div>
+        `;
+
+        return;
+    }
+
+    listaNotificaciones.innerHTML =
+        notificaciones
+            .map(notificacion => {
+                const noLeida =
+                    notificacion.estado
+                    === "ENVIADA";
+
+                return `
+                    <button
+                            type="button"
+                            class="item-notificacion
+                                   ${
+                                       noLeida
+                                           ? "no-leida"
+                                           : ""
+                                   }"
+                            data-id-notificacion="${
+                                escaparHtmlNotificacion(
+                                    notificacion.idNotificacion
+                                )
+                            }"
+                            data-estado="${
+                                escaparHtmlNotificacion(
+                                    notificacion.estado
+                                )
+                            }"
+                    >
+                        <span class="titulo-notificacion">
+                            ${
+                                escaparHtmlNotificacion(
+                                    notificacion.titulo
+                                )
+                            }
+                        </span>
+
+                        <span class="mensaje-notificacion">
+                            ${
+                                escaparHtmlNotificacion(
+                                    notificacion.mensaje
+                                )
+                            }
+                        </span>
+
+                        <span class="fecha-notificacion">
+                            ${
+                                formatearFechaNotificacion(
+                                    notificacion.fechaEnvio
+                                )
+                            }
+                        </span>
+                    </button>
+                `;
+            })
+            .join("");
+}
+
+async function manejarClickNotificacion(
+    event
+) {
+    const elemento =
+        event.target.closest(
+            ".item-notificacion"
+        );
+
+    if (!elemento) {
+        return;
+    }
+
+    const idNotificacion =
+        elemento.dataset.idNotificacion;
+
+    const estado =
+        elemento.dataset.estado;
+
+    if (estado !== "ENVIADA") {
+        return;
+    }
+
+    await marcarNotificacionComoLeida(
+        idNotificacion
+    );
+}
+
+async function marcarNotificacionComoLeida(
+    idNotificacion
+) {
+    try {
+        const csrf =
+            await obtenerCsrfNotificaciones();
+
+        const response = await fetch(
+            `/api/inicio/notificaciones/${idNotificacion}/leer`,
+            {
+                method: "PATCH",
+                credentials: "same-origin",
+
+                headers: {
+                    [csrf.headerName]:
+                        csrf.token
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(response)
+            );
+        }
+
+        await cargarNotificaciones();
+
+    } catch (error) {
+        mostrarMensajePagina(
+            error.message,
+            "danger"
+        );
+    }
+}
+
+async function obtenerCsrfNotificaciones() {
+    const response = await fetch(
+        "/api/csrf",
+        {
+            credentials: "same-origin"
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "No se pudo obtener el token de seguridad."
+        );
+    }
+
+    return response.json();
+}
+
+function formatearFechaNotificacion(
+    valor
+) {
+    if (!valor) {
+        return "";
+    }
+
+    const fecha = new Date(valor);
+
+    return new Intl.DateTimeFormat(
+        "es-PE",
+        {
+            dateStyle: "short",
+            timeStyle: "short"
+        }
+    ).format(fecha);
+}
+
+function escaparHtmlNotificacion(
+    valor
+) {
+    const texto =
+        valor == null
+            ? ""
+            : String(valor);
+
+    return texto
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
