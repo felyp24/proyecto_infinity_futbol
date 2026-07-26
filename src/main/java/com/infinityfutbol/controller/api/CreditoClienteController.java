@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.infinityfutbol.dto.response.BoletaResponse;
+import com.infinityfutbol.service.ComprobanteService;
 
 import java.util.List;
 
@@ -36,6 +38,9 @@ public class CreditoClienteController {
     private final MercadoPagoConfirmacionService
             mercadoPagoConfirmacionService;
 
+    private final ComprobanteService
+            comprobanteService;
+
     public CreditoClienteController(
             CreditoService creditoService,
 
@@ -43,7 +48,8 @@ public class CreditoClienteController {
                     mercadoPagoCheckoutService,
 
             MercadoPagoConfirmacionService
-                    mercadoPagoConfirmacionService
+                    mercadoPagoConfirmacionService,
+            ComprobanteService comprobanteService
     ) {
         this.creditoService =
                 creditoService;
@@ -53,6 +59,8 @@ public class CreditoClienteController {
 
         this.mercadoPagoConfirmacionService =
                 mercadoPagoConfirmacionService;
+        this.comprobanteService =
+                comprobanteService;
     }
 
     @GetMapping("/paquetes")
@@ -121,6 +129,22 @@ public class CreditoClienteController {
     ) {
         return mercadoPagoCheckoutService
                 .continuarPago(
+                        usuarioAutenticado
+                                .getIdUsuario(),
+                        idPago
+                );
+    }
+
+    @GetMapping("/pagos/{idPago}/boleta")
+    public BoletaResponse obtenerBoleta(
+            @AuthenticationPrincipal
+            CustomUserDetails usuarioAutenticado,
+
+            @PathVariable
+            String idPago
+    ) {
+        return comprobanteService
+                .obtenerBoletaCliente(
                         usuarioAutenticado
                                 .getIdUsuario(),
                         idPago

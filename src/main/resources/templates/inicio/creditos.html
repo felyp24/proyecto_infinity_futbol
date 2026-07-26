@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
@@ -253,6 +254,177 @@
     </section>
 
 </main>
+
+<div
+        class="modal fade"
+        id="modalBoleta"
+        tabindex="-1"
+        aria-labelledby="tituloModalBoleta"
+        aria-hidden="true"
+>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2
+                        class="modal-title fs-5"
+                        id="tituloModalBoleta"
+                >
+                    Boleta de venta
+                </h2>
+
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <article class="boleta-contenido">
+
+                    <header class="boleta-cabecera">
+
+                        <div>
+                            <h3>Infinity Fútbol</h3>
+
+                            <p class="mb-0">
+                                Centro de entrenamiento deportivo
+                            </p>
+                        </div>
+
+                        <div class="boleta-numero-contenedor">
+
+                            <span>
+                                BOLETA DE VENTA
+                            </span>
+
+                            <strong id="boletaNumero">
+                                B001-00000000
+                            </strong>
+
+                        </div>
+
+                    </header>
+
+                    <div class="boleta-advertencia">
+                        Comprobante interno de demostración académica.
+                        No válido como comprobante electrónico SUNAT.
+                    </div>
+
+                    <section class="boleta-datos">
+
+                        <div>
+                            <span>Fecha de emisión</span>
+                            <strong id="boletaFecha">-</strong>
+                        </div>
+
+                        <div>
+                            <span>Cliente</span>
+                            <strong id="boletaCliente">-</strong>
+                        </div>
+
+                        <div>
+                            <span>Documento</span>
+                            <strong id="boletaDocumento">-</strong>
+                        </div>
+
+                        <div>
+                            <span>Correo</span>
+                            <strong id="boletaCorreo">-</strong>
+                        </div>
+
+                        <div>
+                            <span>Pago interno</span>
+                            <strong id="boletaIdPago">-</strong>
+                        </div>
+
+                        <div>
+                            <span>Método de pago</span>
+                            <strong id="boletaMetodo">-</strong>
+                        </div>
+
+                    </section>
+
+                    <div class="table-responsive mt-4">
+
+                        <table class="table table-bordered align-middle">
+
+                            <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th class="text-center">
+                                    Créditos
+                                </th>
+                                <th class="text-end">
+                                    Importe
+                                </th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr>
+                                <td id="boletaPaquete">-</td>
+
+                                <td
+                                        id="boletaCreditos"
+                                        class="text-center"
+                                >
+                                    -
+                                </td>
+
+                                <td
+                                        id="boletaImporte"
+                                        class="text-end"
+                                >
+                                    -
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="boleta-total">
+
+                        <span>Total pagado</span>
+
+                        <strong id="boletaTotal">
+                            S/ 0,00
+                        </strong>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
 
 <script
         th:src="@{/js/inicio/creditos.js}"

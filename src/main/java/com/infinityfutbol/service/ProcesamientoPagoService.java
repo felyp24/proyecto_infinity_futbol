@@ -36,6 +36,9 @@ public class ProcesamientoPagoService {
     private final MovimientoCreditoRepository
             movimientoCreditoRepository;
 
+    private final ComprobanteService
+            comprobanteService;
+
     public ProcesamientoPagoService(
             PagoRepository pagoRepository,
 
@@ -43,7 +46,8 @@ public class ProcesamientoPagoService {
                     cuentaCreditoRepository,
 
             MovimientoCreditoRepository
-                    movimientoCreditoRepository
+                    movimientoCreditoRepository,
+            ComprobanteService comprobanteService
     ) {
         this.pagoRepository =
                 pagoRepository;
@@ -53,6 +57,9 @@ public class ProcesamientoPagoService {
 
         this.movimientoCreditoRepository =
                 movimientoCreditoRepository;
+
+        this.comprobanteService =
+                comprobanteService;
     }
 
     @Transactional
@@ -139,6 +146,10 @@ public class ProcesamientoPagoService {
         if (movimientoExistente.isPresent()) {
             pagoRepository.save(pago);
 
+            comprobanteService.emitirSiNoExiste(
+                    pago
+            );
+
             return new ConfirmacionPagoResponse(
                     pago.getIdPago(),
                     pago.getIdPagoExterno(),
@@ -197,6 +208,10 @@ public class ProcesamientoPagoService {
 
         movimientoCreditoRepository.save(
                 movimiento
+        );
+
+        comprobanteService.emitirSiNoExiste(
+                pago
         );
 
         return new ConfirmacionPagoResponse(

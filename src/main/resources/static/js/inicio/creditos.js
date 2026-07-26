@@ -33,7 +33,16 @@ const CLAVE_PAGO_PENDIENTE =
 
 let paquetesCargados = [];
 
+let modalBoleta;
+
 async function iniciarPaginaCreditos() {
+
+    modalBoleta =
+        new bootstrap.Modal(
+            document.getElementById(
+                "modalBoleta"
+            )
+        );
 
     contenedorPaquetes.addEventListener(
         "click",
@@ -422,9 +431,28 @@ function crearAccionesPago(
 
     if (pago.acreditado) {
         return `
-            <span class="text-success fw-semibold">
-                Créditos acreditados
-            </span>
+            <div class="acciones-pago">
+
+                <span class="text-success fw-semibold">
+                    Créditos acreditados
+                </span>
+
+                <button
+                        type="button"
+                        class="btn
+                               btn-sm
+                               btn-outline-success
+                               btn-ver-boleta"
+                        data-id-pago="${
+                            escaparHtml(
+                                pago.idPago
+                            )
+                        }"
+                >
+                    Ver boleta
+                </button>
+
+            </div>
         `;
     }
 
@@ -710,6 +738,21 @@ function escaparHtml(
 async function manejarClickPago(
     event
 ) {
+
+    const botonBoleta =
+        event.target.closest(
+            ".btn-ver-boleta"
+        );
+
+    if (botonBoleta) {
+
+        await mostrarBoleta(
+            botonBoleta.dataset.idPago,
+            botonBoleta
+        );
+
+        return;
+    }
 
     const botonContinuar =
         event.target.closest(
@@ -1055,4 +1098,159 @@ function mostrarResultadoRetorno() {
         document.title,
         "/inicio/creditos"
     );
+}
+
+async function mostrarBoleta(
+    idPago,
+    boton
+) {
+
+    if (!idPago) {
+        return;
+    }
+
+    const textoOriginal =
+        boton.textContent;
+
+    boton.disabled = true;
+    boton.textContent =
+        "Cargando...";
+
+    try {
+
+        const response = await fetch(
+            `/api/inicio/creditos/pagos/${idPago}/boleta`,
+            {
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(
+                    response
+                )
+            );
+        }
+
+        const boleta =
+            await response.json();
+
+        llenarBoleta(boleta);
+
+        modalBoleta.show();
+
+    } catch (error) {
+
+        mostrarMensaje(
+            error.message,
+            "danger"
+        );
+
+    } finally {
+
+        boton.disabled = false;
+
+        boton.textContent =
+            textoOriginal;
+    }
+}
+
+function llenarBoleta(
+    boleta
+) {
+
+    document.getElementById(
+        "boletaNumero"
+    ).textContent =
+        `${boleta.serie}-${boleta.numero}`;
+
+    document.getElementById(
+        "boletaFecha"
+    ).textContent =
+        formatearFechaHora(
+            boleta.fechaEmision
+        );
+
+    document.getElementById(
+        "boletaCliente"
+    ).textContent =
+        boleta.nombreCliente ?? "-";
+
+    document.getElementById(
+        "boletaDocumento"
+    ).textContent =
+        `${formatearTipoDocumento(
+            boleta.tipoDocumento
+        )}: ${boleta.numeroDocumento ?? "-"}`;
+
+    document.getElementById(
+        "boletaCorreo"
+    ).textContent =
+        boleta.correo ?? "-";
+
+    document.getElementById(
+        "boletaIdPago"
+    ).textContent =
+        boleta.idPago ?? "-";
+
+    document.getElementById(
+        "boletaMetodo"
+    ).textContent =
+        formatearMetodoPago(
+            boleta.metodoPago
+        );
+
+    document.getElementById(
+        "boletaPaquete"
+    ).textContent =
+        boleta.nombrePaquete ?? "-";
+
+    document.getElementById(
+        "boletaCreditos"
+    ).textContent =
+        boleta.cantidadCreditos ?? 0;
+
+    const monto =
+        formatearMoneda(
+            boleta.montoTotal
+        );
+
+    document.getElementById(
+        "boletaImporte"
+    ).textContent =
+        monto;
+
+    document.getElementById(
+        "boletaTotal"
+    ).textContent =
+        monto;
+}
+
+function formatearTipoDocumento(
+    tipoDocumento
+) {
+
+    const nombres = {
+        DNI: "DNI",
+        CARNET_EXTRANJERIA:
+            "Carnet de extranjería"
+    };
+
+    return nombres[tipoDocumento]
+        ?? tipoDocumento
+        ?? "Documento";
+}
+
+function formatearMetodoPago(
+    metodoPago
+) {
+
+    if (!metodoPago) {
+        return "-";
+    }
+
+    return String(metodoPago)
+        .replaceAll("_", " ")
+        .toUpperCase();
 }
