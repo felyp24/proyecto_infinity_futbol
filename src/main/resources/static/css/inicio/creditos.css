@@ -1,0 +1,340 @@
+/*
+   ESTILOS GENERALES
+*/
+
+body {
+    margin: 0;
+
+    background-color: #f4f6f8;
+    color: #212529;
+}
+
+
+/*
+   BARRA PRINCIPAL
+*/
+
+.barra-principal {
+    background-color: #143d2b;
+    color: #ffffff;
+}
+
+.marca {
+    color: #ffffff;
+
+    font-size: 1.35rem;
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.marca:hover,
+.marca:focus {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+
+/*
+   ENCABEZADO
+*/
+
+.encabezado-pagina {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.titulo-principal {
+    margin-bottom: 6px;
+
+    color: #143d2b;
+
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.titulo-seccion {
+    color: #143d2b;
+    font-weight: 700;
+}
+
+
+/*
+   SALDO
+*/
+
+.saldo-actual {
+    min-width: 180px;
+    padding: 16px 20px;
+
+    text-align: center;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dce3df;
+    border-radius: 12px;
+
+    box-shadow: 0 4px 14px
+                rgba(0, 0, 0, 0.05);
+}
+
+.saldo-etiqueta {
+    display: block;
+
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.saldo-actual strong {
+    display: inline-block;
+
+    margin-right: 4px;
+
+    color: #143d2b;
+
+    font-size: 1.8rem;
+}
+
+
+/*
+   PAQUETES
+*/
+
+.tarjeta-paquete {
+    height: 100%;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dfe5e1;
+    border-radius: 14px;
+
+    box-shadow: 0 6px 18px
+                rgba(0, 0, 0, 0.06);
+
+    transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.tarjeta-paquete:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 10px 24px
+                rgba(0, 0, 0, 0.10);
+}
+
+.contenido-paquete {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    padding: 24px;
+}
+
+.nombre-paquete {
+    color: #143d2b;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.cantidad-creditos {
+    margin: 18px 0 4px;
+
+    color: #198754;
+
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.texto-creditos {
+    color: #6c757d;
+}
+
+.precio-paquete {
+    margin: 20px 0 4px;
+
+    color: #212529;
+
+    font-size: 1.65rem;
+    font-weight: 700;
+}
+
+.vigencia-paquete {
+    margin-bottom: 22px;
+
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.boton-comprar {
+    margin-top: auto;
+}
+
+
+/*
+   INFORMACIÓN Y CARGA
+*/
+
+.informacion-pago {
+    padding: 20px;
+
+    background-color: #ffffff;
+
+    border-left: 5px solid #198754;
+    border-radius: 10px;
+
+    box-shadow: 0 4px 14px
+                rgba(0, 0, 0, 0.05);
+}
+
+.estado-carga {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    min-height: 180px;
+
+    color: #6c757d;
+
+    background-color: #ffffff;
+
+    border: 1px solid #e1e5e3;
+    border-radius: 12px;
+}
+
+
+/*
+   RESPONSIVE
+*/
+
+@media (max-width: 767px) {
+
+    .encabezado-pagina {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .saldo-actual {
+        width: 100%;
+    }
+}
+
+/*
+   HISTORIAL DE PAGOS
+*/
+
+.historial-pagos {
+    padding: 22px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dfe5e1;
+    border-radius: 12px;
+
+    box-shadow: 0 4px 14px
+                rgba(0, 0, 0, 0.05);
+}
+
+.tabla-pagos-contenedor {
+    border: 1px solid #e2e7e4;
+    border-radius: 10px;
+}
+
+.tabla-pagos-contenedor thead th {
+    padding: 14px;
+
+    color: #143d2b;
+
+    background-color: #f2f6f4;
+
+    border-bottom: 1px solid #dfe5e1;
+
+    font-size: 0.9rem;
+}
+
+.tabla-pagos-contenedor tbody td {
+    padding: 14px;
+}
+
+.identificador-pago {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.estado-pago {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.estado-pago-aprobado {
+    color: #0f5132;
+    background-color: #d1e7dd;
+}
+
+.estado-pago-pendiente {
+    color: #664d03;
+    background-color: #fff3cd;
+}
+
+.estado-pago-proceso {
+    color: #055160;
+    background-color: #cff4fc;
+}
+
+.estado-pago-rechazado {
+    color: #842029;
+    background-color: #f8d7da;
+}
+
+.estado-pago-neutral {
+    color: #41464b;
+    background-color: #e2e3e5;
+}
+
+.detalle-pago {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 767px) {
+
+    .historial-pagos {
+        padding: 16px;
+    }
+}
+
+/*
+   ACCIONES DE PAGO
+*/
+
+.acciones-pago {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    gap: 7px;
+}
+
+.btn-continuar-pago{
+    white-space: nowrap;
+}

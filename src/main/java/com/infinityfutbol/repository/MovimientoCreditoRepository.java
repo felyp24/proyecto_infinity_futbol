@@ -3,7 +3,8 @@ package com.infinityfutbol.repository;
 import com.infinityfutbol.entity.MovimientoCredito;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import com.infinityfutbol.entity.enums.TipoMovimientoCredito;
+import java.util.Optional;
 import java.util.List;
 
 public interface MovimientoCreditoRepository
@@ -16,5 +17,11 @@ public interface MovimientoCreditoRepository
     List<MovimientoCredito>
     findByCuentaCredito_Alumno_Usuario_IdUsuarioOrderByFechaMovimientoDesc(
             String idUsuario
+    );
+
+    Optional<MovimientoCredito>
+    findByIdPagoAndTipoMovimiento(
+            String idPago,
+            TipoMovimientoCredito tipoMovimiento
     );
 }
