@@ -152,6 +152,33 @@
         .boton-habilitar:hover {
             background-color: #0b5ed7;
         }
+
+        .navegacion-admin {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 16px;
+        }
+
+        .enlace-admin {
+            display: inline-block;
+
+            padding: 9px 14px;
+
+            color: #ffffff;
+            background-color: #0d6efd;
+
+            border-radius: 5px;
+
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .enlace-admin:hover {
+            background-color: #0b5ed7;
+        }
     </style>
 </head>
 
@@ -166,6 +193,21 @@
             Consulta los usuarios registrados y administra
             sus permisos dentro del sistema.
         </p>
+
+        <nav class="navegacion-admin">
+
+            <a class="enlace-admin"
+               th:href="@{/admin/creditos}">
+                Gestionar créditos
+            </a>
+
+            <a class="enlace-admin"
+               th:href="@{/admin/alumnos}">
+                Ver alumnos
+            </a>
+
+        </nav>
+        <br>
 
         <button id="botonLogout"
                 class="boton-logout"

@@ -4,6 +4,7 @@ public enum TipoMovimientoCredito {
 
     RECARGA,
     CONSUMO,
-    DEVOLUCION
+    DEVOLUCION,
+    AJUSTE_ADMIN
 
 }
