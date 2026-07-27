@@ -10,4 +10,9 @@ public class CreditoAdminWebController {
     public String mostrarGestorCreditos() {
         return "admin/creditos";
     }
+
+    @GetMapping("/admin/creditos/historial")
+    public String mostrarHistorialCreditos() {
+        return "admin/creditos-historial";
+    }
 }

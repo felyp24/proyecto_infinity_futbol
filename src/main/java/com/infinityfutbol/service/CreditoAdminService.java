@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
+import com.infinityfutbol.dto.response.HistorialAjusteCreditoResponse;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -270,5 +270,79 @@ public class CreditoAdminService {
         }
 
         return texto.trim();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<HistorialAjusteCreditoResponse>
+    listarHistorialAjustes(
+            String texto,
+            Pageable pageable
+    ) {
+        String criterio =
+                texto == null
+                        ? ""
+                        : texto.trim();
+
+        return movimientoCreditoRepository
+                .buscarHistorialAjustes(
+                        TipoMovimientoCredito.AJUSTE_ADMIN,
+                        criterio,
+                        pageable
+                )
+                .map(
+                        this::convertirHistorialResponse
+                );
+    }
+
+    private HistorialAjusteCreditoResponse
+    convertirHistorialResponse(
+            MovimientoCredito movimiento
+    ) {
+        CuentaCredito cuentaCredito =
+                movimiento.getCuentaCredito();
+
+        Alumno alumno =
+                cuentaCredito.getAlumno();
+
+        Usuario usuario =
+                alumno.getUsuario();
+
+        int cambio =
+                movimiento.getCantidad() == null
+                        ? 0
+                        : movimiento.getCantidad();
+
+        String tipoCambio;
+
+        if (cambio > 0) {
+            tipoCambio = "AUMENTO";
+        } else if (cambio < 0) {
+            tipoCambio = "REDUCCION";
+        } else {
+            tipoCambio = "SIN_CAMBIO";
+        }
+
+        String nombreCompleto =
+                (
+                        alumno.getNombres()
+                                + " "
+                                + alumno.getApellidos()
+                ).trim();
+
+        return new HistorialAjusteCreditoResponse(
+                movimiento
+                        .getIdMovimientoCredito(),
+
+                alumno.getIdAlumno(),
+                nombreCompleto,
+                usuario.getUsername(),
+                alumno.getNumeroDocumento(),
+
+                cambio,
+                tipoCambio,
+
+                movimiento.getFechaMovimiento(),
+                movimiento.getDescripcion()
+        );
     }
 }

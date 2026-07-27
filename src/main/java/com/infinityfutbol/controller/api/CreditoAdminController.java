@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.infinityfutbol.dto.response.HistorialAjusteCreditoResponse;
+
 
 @RestController
 @RequestMapping("/api/admin/creditos")
@@ -48,6 +50,25 @@ public class CreditoAdminController {
                 texto,
                 pageable
         );
+    }
+
+    @GetMapping("/historial")
+    public Page<HistorialAjusteCreditoResponse>
+    listarHistorialAjustes(
+            @RequestParam(
+                    required = false,
+                    defaultValue = ""
+            )
+            String texto,
+
+            @PageableDefault(size = 10)
+            Pageable pageable
+    ) {
+        return creditoAdminService
+                .listarHistorialAjustes(
+                        texto,
+                        pageable
+                );
     }
 
     @PatchMapping("/{idAlumno}")
