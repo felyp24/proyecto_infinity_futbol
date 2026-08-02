@@ -180,8 +180,11 @@ async function cargarResumen() {
 
         const resumen = await response.json();
 
-        nombreCliente.textContent =
-            resumen.nombreCompleto;
+        if (nombreCliente) {
+            nombreCliente.textContent =
+                resumen.nombreCompleto
+                ?? "cliente";
+        }
 
         saldoActual =
             resumen.saldoCreditos ?? 0;

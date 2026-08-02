@@ -11,8 +11,12 @@ public class InicioWebController {
         return "inicio/inicio";
     }
 
+    /*
+     * Conservamos temporalmente esta ruta para que
+     * enlaces antiguos no produzcan un error 404.
+     */
     @GetMapping("/inicio/reservas")
-    public String mostrarModuloReservas() {
-        return "inicio/reservas";
+    public String redirigirReservasAlInicio() {
+        return "redirect:/inicio";
     }
 }

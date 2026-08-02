@@ -13,6 +13,8 @@
 
     <div class="nav-app-contenedor">
 
+        <!-- Marca del sistema -->
+
         <a
                 class="nav-app-marca"
                 th:href="${navRutaInicio}"
@@ -20,20 +22,26 @@
             Infinity Fútbol
         </a>
 
+        <!-- Botón para celulares -->
+
         <button
                 type="button"
                 class="nav-app-movil"
-                aria-label="Abrir menú"
+                aria-label="Abrir menú de navegación"
                 aria-expanded="false"
                 data-nav-movil
         >
             ☰
         </button>
 
+        <!-- Menú principal -->
+
         <div
                 class="nav-app-menu"
                 data-nav-menu
         >
+
+            <!-- Página principal correspondiente al rol -->
 
             <a
                     class="nav-app-enlace"
@@ -45,7 +53,9 @@
                 Principal
             </a>
 
-            <!-- Módulos del cliente -->
+            <!-- ========================================= -->
+            <!-- MENÚ DEL CLIENTE                         -->
+            <!-- ========================================= -->
 
             <div
                     class="nav-app-desplegable"
@@ -59,35 +69,20 @@
                         aria-expanded="false"
                 >
                     Reservas
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div class="nav-app-submenu">
 
-                    <a
-                            th:href="@{
-                                /inicio/reservas
-                                #calendarioReservas
-                            }"
-                    >
+                    <a th:href="@{/inicio#calendarioReservas}">
                         Calendario de clases
                     </a>
 
-                    <a
-                            th:href="@{
-                                /inicio/reservas
-                                #reservasProximas
-                            }"
-                    >
+                    <a th:href="@{/inicio#reservasProximasSeccion}">
                         Próximas reservas
                     </a>
 
-                    <a
-                            th:href="@{
-                                /inicio/reservas
-                                #historialReservas
-                            }"
-                    >
+                    <a th:href="@{/inicio#historialReservas}">
                         Historial de reservas
                     </a>
 
@@ -107,7 +102,7 @@
                         aria-expanded="false"
                 >
                     Créditos
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div class="nav-app-submenu">
@@ -116,12 +111,7 @@
                         Recargar créditos
                     </a>
 
-                    <a
-                            th:href="@{
-                                /inicio/creditos
-                                #historialPagos
-                            }"
-                    >
+                    <a th:href="@{/inicio/creditos#historialPagos}">
                         Historial de pagos
                     </a>
 
@@ -129,7 +119,9 @@
 
             </div>
 
-            <!-- Módulo de coordinador -->
+            <!-- ========================================= -->
+            <!-- MENÚ DEL COORDINADOR Y ADMINISTRADOR     -->
+            <!-- ========================================= -->
 
             <div
                     class="nav-app-desplegable"
@@ -143,7 +135,7 @@
                         aria-expanded="false"
                 >
                     Clases
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div class="nav-app-submenu">
@@ -156,7 +148,9 @@
 
             </div>
 
-            <!-- Módulos administrativos -->
+            <!-- ========================================= -->
+            <!-- MENÚ EXCLUSIVO DEL ADMINISTRADOR         -->
+            <!-- ========================================= -->
 
             <div
                     class="nav-app-desplegable"
@@ -170,7 +164,7 @@
                         aria-expanded="false"
                 >
                     Administración
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div class="nav-app-submenu">
@@ -199,7 +193,7 @@
                         aria-expanded="false"
                 >
                     Gestión de créditos
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div class="nav-app-submenu">
@@ -208,11 +202,7 @@
                         Editar créditos
                     </a>
 
-                    <a
-                            th:href="@{
-                                /admin/creditos/historial
-                            }"
-                    >
+                    <a th:href="@{/admin/creditos/historial}">
                         Historial de ajustes
                     </a>
 
@@ -220,7 +210,9 @@
 
             </div>
 
-            <!-- Cuenta disponible para cualquier rol -->
+            <!-- ========================================= -->
+            <!-- CUENTA: DISPONIBLE PARA TODOS LOS ROLES  -->
+            <!-- ========================================= -->
 
             <div class="nav-app-desplegable">
 
@@ -231,7 +223,7 @@
                         aria-expanded="false"
                 >
                     Cuenta
-                    <span>▾</span>
+                    <span aria-hidden="true">▾</span>
                 </button>
 
                 <div
@@ -241,9 +233,7 @@
 
                     <div class="nav-app-usuario">
 
-                        <strong
-                                th:text="${navUsuario}"
-                        >
+                        <strong th:text="${navUsuario}">
                             usuario
                         </strong>
 
@@ -262,6 +252,10 @@
 
                     <a th:href="@{/perfil}">
                         Mi perfil
+                    </a>
+
+                    <a th:href="@{/perfil/editar}">
+                        Editar datos personales
                     </a>
 
                     <a th:href="@{/perfil/seguridad}">
