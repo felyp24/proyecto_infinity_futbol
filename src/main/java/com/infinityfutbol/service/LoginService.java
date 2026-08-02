@@ -137,11 +137,15 @@ public class LoginService {
             List<String> roles
     ) {
         if (roles.contains("ADMINISTRADOR")) {
-            return "/admin/roles";
+            return "/admin";
         }
 
         if (roles.contains("COORDINADOR")) {
-            return "/coordinador/clases";
+            return "/coordinador";
+        }
+
+        if (roles.contains("ENTRENADOR")) {
+            return "/perfil";
         }
 
         if (roles.contains("USUARIO")) {

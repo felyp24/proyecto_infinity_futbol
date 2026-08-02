@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Coordinación | Infinity Fútbol
+    </title>
+
+    <!-- Estilos de la barra de navegación -->
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <!-- Estilos del panel principal -->
+    <link
+            th:href="@{/css/componentes/panel-rol.css}"
+            rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<!-- Barra de navegación según el rol -->
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="panel-rol-contenedor">
+
+    <!-- Bienvenida -->
+
+    <section class="panel-rol-bienvenida">
+
+        <p class="panel-rol-etiqueta">
+            Panel de coordinación
+        </p>
+
+        <h1>
+            Bienvenido,
+            <span th:text="${navUsuario}">
+                coordinador
+            </span>
+        </h1>
+
+        <p>
+            Desde este panel puedes acceder a la gestión
+            y programación de las clases de Infinity Fútbol.
+        </p>
+
+    </section>
+
+    <!-- Único módulo permitido al coordinador -->
+
+    <section class="panel-rol-seccion">
+
+        <h2>
+            Módulo de coordinación
+        </h2>
+
+        <p class="panel-rol-descripcion">
+            Selecciona el módulo para administrar las clases.
+        </p>
+
+        <div class="panel-rol-modulos">
+
+            <a
+                    th:href="@{/coordinador/clases}"
+                    class="panel-rol-modulo"
+            >
+
+                <span
+                        class="panel-rol-icono"
+                        aria-hidden="true"
+                >
+                    CL
+                </span>
+
+                <h3>
+                    Gestión de clases
+                </h3>
+
+                <p>
+                    Crea nuevas clases y modifica su fecha,
+                    horario, entrenador, cancha y cupos
+                    disponibles.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Gestionar clases →
+                </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- Control de los desplegables de la barra -->
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<!-- Cierre de sesión -->
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>

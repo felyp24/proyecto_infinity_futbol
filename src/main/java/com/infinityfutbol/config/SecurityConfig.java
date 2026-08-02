@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
@@ -40,7 +41,9 @@ public class SecurityConfig {
                         customUserDetailsService
                 );
 
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(
+                passwordEncoder
+        );
 
         return provider;
     }
@@ -49,6 +52,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration
     ) throws Exception {
+
         return authenticationConfiguration
                 .getAuthenticationManager();
     }
@@ -69,149 +73,176 @@ public class SecurityConfig {
                         customUserDetailsService
                 );
 
+        /*
+         * Usamos un matcher explícito basado en la URI.
+         * De esta manera /login siempre será reconocida
+         * como ruta pública.
+         */
+        RequestMatcher rutasPublicas =
+                request -> esRutaPublica(
+                        request.getRequestURI()
+                );
+
         http
                 .authenticationProvider(
                         authenticationProvider
                 )
 
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                .authorizeHttpRequests(authorize -> authorize
+                .authorizeHttpRequests(authorize ->
+                        authorize
 
-                        /*
-                         * Permite los despachos internos generados
-                         * cuando ocurre un error o un forward.
-                         */
-                        .dispatcherTypeMatchers(
-                                DispatcherType.ERROR,
-                                DispatcherType.FORWARD
-                        )
-                        .permitAll()
+                                /*
+                                 * Permitir errores y redirecciones internas.
+                                 */
+                                .dispatcherTypeMatchers(
+                                        DispatcherType.ERROR,
+                                        DispatcherType.FORWARD
+                                )
+                                .permitAll()
 
-                        /*
-                         * Rutas públicas.
-                         */
-                        .requestMatchers(
-                                "/",
-                                "/login",
-                                "/registro",
-                                "/error",
-                                "/favicon.ico",
+                                /*
+                                 * Login, registro, autenticación,
+                                 * CSRF y archivos estáticos.
+                                 */
+                                .requestMatchers(
+                                        rutasPublicas
+                                )
+                                .permitAll()
 
-                                "/api/auth/registro",
-                                "/api/auth/login",
-                                "/api/auth/logout",
-                                "/api/csrf",
+                                /*
+                                 * Administrador.
+                                 */
+                                .requestMatchers(
+                                        "/admin",
+                                        "/admin/**",
+                                        "/api/admin/**"
+                                )
+                                .hasRole(
+                                        "ADMINISTRADOR"
+                                )
 
-                                "/css/**",
-                                "/js/**",
-                                "/images/**"
-                        )
-                        .permitAll()
+                                /*
+                                 * Coordinador y administrador.
+                                 */
+                                .requestMatchers(
+                                        "/coordinador",
+                                        "/coordinador/**",
+                                        "/api/coordinador/**"
+                                )
+                                .hasAnyRole(
+                                        "COORDINADOR",
+                                        "ADMINISTRADOR"
+                                )
 
-                        /*
-                         * Rutas exclusivas del administrador.
-                         */
-                        .requestMatchers(
-                                "/admin/**",
-                                "/api/admin/**"
-                        )
-                        .hasRole("ADMINISTRADOR")
+                                /*
+                                 * Cliente.
+                                 */
+                                .requestMatchers(
+                                        "/inicio",
+                                        "/inicio/**",
+                                        "/api/inicio/**"
+                                )
+                                .hasRole(
+                                        "USUARIO"
+                                )
 
-                        .requestMatchers(
-                                "/coordinador/**",
-                                "/api/coordinador/**"
-                        )
-                        .hasAnyRole(
-                                "COORDINADOR",
-                                "ADMINISTRADOR"
-                        )
-
-                        .requestMatchers(
-                                "/inicio",
-                                "/inicio/**",
-                                "/api/inicio/**"
-                        )
-                        .hasRole("USUARIO")
-
-                        /*
-                         * El resto necesita autenticación.
-                         */
-                        .anyRequest()
-                        .authenticated()
+                                /*
+                                 * Perfil y otras rutas autenticadas.
+                                 */
+                                .anyRequest()
+                                .authenticated()
                 )
 
-                .exceptionHandling(exception -> exception
+                .exceptionHandling(exception ->
+                        exception
 
-                        /*
-                         * Se ejecuta cuando el usuario no está autenticado.
-                         */
-                        .authenticationEntryPoint(
-                                (request,
-                                 response,
-                                 authenticationException) -> {
-
-                                    if (esSolicitudApi(request.getRequestURI())) {
-                                        escribirRespuestaJson(
+                                .authenticationEntryPoint(
+                                        (
+                                                request,
                                                 response,
-                                                HttpServletResponse.SC_UNAUTHORIZED,
-                                                "Debes iniciar sesión nuevamente"
-                                        );
+                                                authenticationException
+                                        ) -> {
 
-                                        return;
-                                    }
+                                            String ruta =
+                                                    request.getRequestURI();
 
-                                    response.sendRedirect("/login");
-                                }
-                        )
+                                            /*
+                                             * Protección adicional:
+                                             * una ruta pública nunca debe
+                                             * redirigirse hacia ella misma.
+                                             */
+                                            if (esRutaPublica(ruta)) {
+                                                response.setStatus(
+                                                        HttpServletResponse
+                                                                .SC_UNAUTHORIZED
+                                                );
 
-                        /*
-                         * Se ejecuta cuando está autenticado,
-                         * pero no tiene el rol requerido.
-                         */
-                        .accessDeniedHandler(
-                                (request,
-                                 response,
-                                 accessDeniedException) -> {
+                                                return;
+                                            }
 
-                                    if (esSolicitudApi(request.getRequestURI())) {
-                                        escribirRespuestaJson(
+                                            if (esSolicitudApi(ruta)) {
+                                                escribirRespuestaJson(
+                                                        response,
+                                                        HttpServletResponse
+                                                                .SC_UNAUTHORIZED,
+                                                        "Debes iniciar sesión nuevamente"
+                                                );
+
+                                                return;
+                                            }
+
+                                            response.sendRedirect(
+                                                    "/login"
+                                            );
+                                        }
+                                )
+
+                                .accessDeniedHandler(
+                                        (
+                                                request,
                                                 response,
-                                                HttpServletResponse.SC_FORBIDDEN,
-                                                "No tienes permiso para realizar esta operación"
-                                        );
+                                                accessDeniedException
+                                        ) -> {
 
-                                        return;
-                                    }
+                                            String ruta =
+                                                    request.getRequestURI();
 
-                                    response.sendRedirect(
-                                            "/perfil?acceso=denegado"
-                                    );
-                                }
-                        )
+                                            if (esSolicitudApi(ruta)) {
+                                                escribirRespuestaJson(
+                                                        response,
+                                                        HttpServletResponse
+                                                                .SC_FORBIDDEN,
+                                                        "No tienes permiso para realizar esta operación"
+                                                );
+
+                                                return;
+                                            }
+
+                                            response.sendRedirect(
+                                                    "/perfil?acceso=denegado"
+                                            );
+                                        }
+                                )
                 )
 
-                /*
-                 * El login se procesa mediante /api/auth/login.
-                 */
+
                 .formLogin(
                         AbstractHttpConfigurer::disable
                 )
 
-                /*
-                 * El logout se procesa mediante /api/auth/logout.
-                 */
+
                 .logout(
                         AbstractHttpConfigurer::disable
                 )
 
                 /*
-                 * El filtro consulta la cookie ACCESS_TOKEN
-                 * antes de los filtros tradicionales.
+                 * Filtro JWT.
                  */
                 .addFilterBefore(
                         jwtAuthenticationFilter,
@@ -219,6 +250,30 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    private static boolean esRutaPublica(
+            String ruta
+    ) {
+        if (ruta == null) {
+            return false;
+        }
+
+        return ruta.equals("/")
+                || ruta.equals("/login")
+                || ruta.equals("/registro")
+                || ruta.equals("/error")
+                || ruta.equals("/favicon.ico")
+
+                || ruta.equals("/api/auth/login")
+                || ruta.equals("/api/auth/registro")
+                || ruta.equals("/api/auth/logout")
+                || ruta.equals("/api/csrf")
+
+                || ruta.startsWith("/css/")
+                || ruta.startsWith("/js/")
+                || ruta.startsWith("/images/")
+                || ruta.startsWith("/webjars/");
     }
 
     private static boolean esSolicitudApi(
@@ -234,9 +289,17 @@ public class SecurityConfig {
             String detalle
     ) throws java.io.IOException {
 
-        response.setStatus(estado);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setStatus(
+                estado
+        );
+
+        response.setContentType(
+                "application/json"
+        );
+
+        response.setCharacterEncoding(
+                "UTF-8"
+        );
 
         response.getWriter().write(
                 """
@@ -255,7 +318,13 @@ public class SecurityConfig {
             String texto
     ) {
         return texto
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"");
+                .replace(
+                        "\\",
+                        "\\\\"
+                )
+                .replace(
+                        "\"",
+                        "\\\""
+                );
     }
 }

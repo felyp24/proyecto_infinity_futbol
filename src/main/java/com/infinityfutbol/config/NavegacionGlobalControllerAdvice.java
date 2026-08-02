@@ -33,8 +33,7 @@ public class NavegacionGlobalControllerAdvice {
                         .getAuthorities()
                         .stream()
                         .map(
-                                GrantedAuthority::
-                                        getAuthority
+                                GrantedAuthority::getAuthority
                         )
                         .collect(
                                 Collectors.toSet()
@@ -77,6 +76,7 @@ public class NavegacionGlobalControllerAdvice {
                 determinarRutaInicio(
                         esAdministrador,
                         esCoordinador,
+                        esEntrenador,
                         esUsuario
                 );
 
@@ -137,14 +137,24 @@ public class NavegacionGlobalControllerAdvice {
     private String determinarRutaInicio(
             boolean esAdministrador,
             boolean esCoordinador,
+            boolean esEntrenador,
             boolean esUsuario
     ) {
+        /*
+         * El orden importa en cuentas que
+         * tengan más de un rol.
+         */
+
         if (esAdministrador) {
-            return "/admin/roles";
+            return "/admin";
         }
 
         if (esCoordinador) {
-            return "/coordinador/clases";
+            return "/coordinador";
+        }
+
+        if (esEntrenador) {
+            return "/perfil";
         }
 
         if (esUsuario) {

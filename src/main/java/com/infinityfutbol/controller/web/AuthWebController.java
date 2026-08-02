@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AuthWebController {
 
-    @GetMapping("/registro")
-    public String mostrarRegistro() {
-        return "auth/registro";
+
+    @GetMapping("/")
+    public String mostrarPaginaInicial() {
+        return "redirect:/login";
     }
+
 
     @GetMapping("/login")
     public String mostrarLogin(
@@ -20,6 +22,13 @@ public class AuthWebController {
                     required = false
             )
             String registro,
+
+            @RequestParam(
+                    name = "logout",
+                    required = false
+            )
+            String logout,
+
             Model model
     ) {
         model.addAttribute(
@@ -27,6 +36,16 @@ public class AuthWebController {
                 "exitoso".equals(registro)
         );
 
+        model.addAttribute(
+                "logoutExitoso",
+                "exitoso".equals(logout)
+        );
+
         return "auth/login";
+    }
+
+    @GetMapping("/registro")
+    public String mostrarRegistro() {
+        return "auth/registro";
     }
 }

@@ -39,6 +39,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(
+            HttpServletRequest request
+    ) {
+        String ruta = request.getRequestURI();
+
+        return ruta.equals("/")
+                || ruta.equals("/login")
+                || ruta.equals("/registro")
+                || ruta.equals("/error")
+                || ruta.equals("/favicon.ico")
+
+                || ruta.equals("/api/auth/login")
+                || ruta.equals("/api/auth/registro")
+                || ruta.equals("/api/auth/logout")
+                || ruta.equals("/api/csrf")
+
+                || ruta.startsWith("/css/")
+                || ruta.startsWith("/js/")
+                || ruta.startsWith("/images/");
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Administración | Infinity Fútbol
+    </title>
+
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/componentes/panel-rol.css}"
+            rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<!-- Barra del administrador -->
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="panel-rol-contenedor">
+
+    <section class="panel-rol-bienvenida">
+
+        <p class="panel-rol-etiqueta">
+            Panel administrativo
+        </p>
+
+        <h1>
+            Bienvenido,
+            <span th:text="${navUsuario}">
+                administrador
+            </span>
+        </h1>
+
+        <p>
+            Administra los usuarios, alumnos, créditos
+            y clases del centro deportivo Infinity Fútbol.
+        </p>
+
+    </section>
+
+    <section class="panel-rol-seccion">
+
+        <h2>
+            Módulos administrativos
+        </h2>
+
+        <p class="panel-rol-descripcion">
+            Selecciona el módulo que deseas gestionar.
+        </p>
+
+        <div class="panel-rol-modulos">
+
+            <!-- Roles -->
+
+            <a
+                    th:href="@{/admin/roles}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    R
+                </span>
+
+                <h3>
+                    Roles y permisos
+                </h3>
+
+                <p>
+                    Consulta los usuarios registrados
+                    y administra sus roles dentro del sistema.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Gestionar roles →
+                </span>
+
+            </a>
+
+            <!-- Alumnos -->
+
+            <a
+                    th:href="@{/admin/alumnos}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    A
+                </span>
+
+                <h3>
+                    Gestión de alumnos
+                </h3>
+
+                <p>
+                    Consulta, busca y modifica la información
+                    de los alumnos registrados.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Ver alumnos →
+                </span>
+
+            </a>
+
+            <!-- Créditos -->
+
+            <a
+                    th:href="@{/admin/creditos}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    C
+                </span>
+
+                <h3>
+                    Gestión de créditos
+                </h3>
+
+                <p>
+                    Consulta y modifica el saldo de créditos
+                    disponible para cada alumno.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Editar créditos →
+                </span>
+
+            </a>
+
+            <!-- Historial -->
+
+            <a
+                    th:href="@{/admin/creditos/historial}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    H
+                </span>
+
+                <h3>
+                    Historial de ajustes
+                </h3>
+
+                <p>
+                    Revisa los aumentos y reducciones
+                    administrativas de créditos.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Ver historial →
+                </span>
+
+            </a>
+
+            <!-- Clases -->
+
+            <a
+                    th:href="@{/coordinador/clases}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    CL
+                </span>
+
+                <h3>
+                    Gestión de clases
+                </h3>
+
+                <p>
+                    Crea clases y modifica su fecha,
+                    horario, entrenador o cancha.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Gestionar clases →
+                </span>
+
+            </a>
+
+            <!-- Perfil -->
+
+            <a
+                    th:href="@{/perfil}"
+                    class="panel-rol-modulo"
+            >
+
+                <span class="panel-rol-icono">
+                    P
+                </span>
+
+                <h3>
+                    Mi cuenta
+                </h3>
+
+                <p>
+                    Consulta la información de tu cuenta
+                    y modifica tus credenciales.
+                </p>
+
+                <span class="panel-rol-enlace">
+                    Ver cuenta →
+                </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>
