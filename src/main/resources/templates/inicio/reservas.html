@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Reservas | Infinity Fútbol</title>
+
+    <!-- Bootstrap -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <!-- Barra de navegación compartida -->
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <!-- Estilos del calendario y las reservas -->
+    <link
+            th:href="@{/css/inicio/inicio.css}"
+            rel="stylesheet"
+    >
+</head>
+
+<body>
+
+<!-- Barra de navegación según el rol -->
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="container py-4">
+
+    <!-- ================================================= -->
+    <!-- NOTIFICACIONES                                    -->
+    <!-- ================================================= -->
+
+    <section
+            class="d-flex justify-content-end mb-4"
+            aria-label="Notificaciones del usuario"
+    >
+
+        <div class="dropdown">
+
+            <button
+                    type="button"
+                    id="btnNotificaciones"
+                    class="btn
+                           btn-outline-success
+                           boton-notificaciones
+                           position-relative"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false"
+                    aria-label="Abrir notificaciones"
+            >
+
+                <span
+                        class="icono-campana"
+                        aria-hidden="true"
+                >
+                    🔔
+                </span>
+
+                <span
+                        id="contadorNotificaciones"
+                        class="position-absolute
+                               top-0
+                               start-100
+                               translate-middle
+                               badge
+                               rounded-pill
+                               bg-danger
+                               d-none"
+                >
+                    0
+                </span>
+
+            </button>
+
+            <div
+                    class="dropdown-menu
+                           dropdown-menu-end
+                           panel-notificaciones
+                           p-0"
+                    aria-labelledby="btnNotificaciones"
+            >
+
+                <div class="encabezado-notificaciones">
+
+                    <strong>
+                        Notificaciones
+                    </strong>
+
+                    <button
+                            type="button"
+                            id="btnActualizarNotificaciones"
+                            class="btn
+                                   btn-sm
+                                   btn-outline-secondary"
+                    >
+                        Actualizar
+                    </button>
+
+                </div>
+
+                <div
+                        id="listaNotificaciones"
+                        class="lista-notificaciones"
+                >
+
+                    <div class="estado-notificaciones">
+                        Cargando notificaciones...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================================================= -->
+    <!-- PRESENTACIÓN                                      -->
+    <!-- ================================================= -->
+
+    <section class="mb-4">
+
+        <h1 class="titulo-principal">
+            Reservas de clases
+        </h1>
+
+        <p class="text-muted mb-0">
+            Consulta las clases disponibles, realiza reservas
+            y revisa tu historial.
+        </p>
+
+    </section>
+
+    <!-- ================================================= -->
+    <!-- RESUMEN                                           -->
+    <!-- ================================================= -->
+
+    <section class="row g-3 mb-4">
+
+        <div class="col-md-6">
+
+            <article class="tarjeta-resumen">
+
+                <div>
+
+                    <p class="etiqueta-resumen">
+                        Créditos disponibles
+                    </p>
+
+                    <p
+                            id="saldoCreditos"
+                            class="valor-resumen"
+                    >
+                        0
+                    </p>
+
+                </div>
+
+                <div class="icono-resumen">
+                    C
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="col-md-6">
+
+            <article class="tarjeta-resumen">
+
+                <div>
+
+                    <p class="etiqueta-resumen">
+                        Reservas próximas
+                    </p>
+
+                    <!--
+                        Este ID lo utiliza inicio.js para colocar
+                        la cantidad de reservas próximas.
+                    -->
+                    <p
+                            id="reservasProximas"
+                            class="valor-resumen"
+                    >
+                        0
+                    </p>
+
+                </div>
+
+                <div class="icono-resumen">
+                    R
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- Mensajes generales -->
+
+    <div
+            id="mensajePagina"
+            class="alert d-none"
+            role="alert"
+    ></div>
+
+    <!-- ================================================= -->
+    <!-- CALENDARIO                                        -->
+    <!-- ================================================= -->
+
+    <section
+            id="calendarioReservas"
+            class="panel-calendario"
+    >
+
+        <div class="d-flex
+                    flex-wrap
+                    justify-content-between
+                    align-items-center
+                    gap-3
+                    mb-3">
+
+            <div>
+
+                <h2 class="h4 titulo-seccion mb-1">
+                    Calendario de clases
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Pulsa una clase para consultar sus detalles
+                    y realizar una reserva.
+                </p>
+
+            </div>
+
+            <button
+                    id="btnActualizarCalendario"
+                    type="button"
+                    class="btn btn-outline-secondary"
+            >
+                Actualizar
+            </button>
+
+        </div>
+
+        <div class="leyenda-calendario mb-4">
+
+            <span class="elemento-leyenda">
+
+                <span class="color-leyenda disponible"></span>
+
+                Disponible
+
+            </span>
+
+            <span class="elemento-leyenda">
+
+                <span class="color-leyenda reservada"></span>
+
+                Ya reservada
+
+            </span>
+
+            <span class="elemento-leyenda">
+
+                <span class="color-leyenda sin-cupos"></span>
+
+                Sin cupos
+
+            </span>
+
+        </div>
+
+        <div id="calendario"></div>
+
+    </section>
+
+    <!-- ================================================= -->
+    <!-- PRÓXIMAS RESERVAS                                 -->
+    <!-- ================================================= -->
+
+    <section
+            id="reservasProximasSeccion"
+            class="panel-reservas mt-4"
+    >
+
+        <div class="mb-3">
+
+            <h2 class="h4 titulo-seccion mb-1">
+                Mis próximas reservas
+            </h2>
+
+            <p class="text-muted mb-0">
+                Consulta las clases que tienes confirmadas
+                y que todavía no han finalizado.
+            </p>
+
+        </div>
+
+        <div
+                id="listaReservasProximas"
+                class="row g-3"
+                aria-live="polite"
+        >
+
+            <div class="col-12">
+
+                <div class="estado-reservas">
+                    Cargando reservas...
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================================================= -->
+    <!-- HISTORIAL DE RESERVAS                             -->
+    <!-- ================================================= -->
+
+    <section
+            id="historialReservas"
+            class="panel-reservas
+                   panel-historial
+                   mt-4"
+    >
+
+        <div class="d-flex
+                    flex-wrap
+                    justify-content-between
+                    align-items-center
+                    gap-3
+                    mb-3">
+
+            <div>
+
+                <h2 class="h4 titulo-seccion mb-1">
+                    Historial de reservas
+                </h2>
+
+                <p class="text-muted mb-0">
+                    Consulta las reservas correspondientes
+                    a clases cuyo horario ya finalizó.
+                </p>
+
+            </div>
+
+            <button
+                    type="button"
+                    id="btnActualizarHistorial"
+                    class="btn btn-outline-secondary"
+            >
+                Actualizar
+            </button>
+
+        </div>
+
+        <div
+                id="listaReservasPasadas"
+                class="row g-3"
+                aria-live="polite"
+        >
+
+            <div class="col-12">
+
+                <div class="estado-reservas">
+                    Cargando historial...
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="historial-paginacion mt-4">
+
+            <span
+                    id="informacionPaginaHistorial"
+                    class="text-muted"
+            >
+                Página 0 de 0
+            </span>
+
+            <div class="d-flex gap-2">
+
+                <button
+                        type="button"
+                        id="btnHistorialAnterior"
+                        class="btn
+                               btn-outline-secondary
+                               btn-sm"
+                        disabled
+                >
+                    Anterior
+                </button>
+
+                <button
+                        type="button"
+                        id="btnHistorialSiguiente"
+                        class="btn
+                               btn-outline-secondary
+                               btn-sm"
+                        disabled
+                >
+                    Siguiente
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ===================================================== -->
+<!-- MODAL DE DETALLES DE LA CLASE                         -->
+<!-- ===================================================== -->
+
+<div
+        class="modal fade"
+        id="modalClase"
+        tabindex="-1"
+        aria-labelledby="modalTitulo"
+        aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span
+                            id="modalSituacion"
+                            class="badge text-bg-success mb-2"
+                    >
+                        Disponible
+                    </span>
+
+                    <h2
+                            id="modalTitulo"
+                            class="modal-title fs-5"
+                    >
+                        Detalles de la clase
+                    </h2>
+
+                </div>
+
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div
+                        id="mensajeModal"
+                        class="alert d-none"
+                        role="alert"
+                ></div>
+
+                <p
+                        id="modalDescripcion"
+                        class="text-muted"
+                >
+                    Sin descripción.
+                </p>
+
+                <div class="detalle-clase">
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Fecha
+                        </span>
+
+                        <span id="modalFecha">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Horario
+                        </span>
+
+                        <span id="modalHorario">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Entrenador
+                        </span>
+
+                        <span id="modalEntrenador">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Sede
+                        </span>
+
+                        <span id="modalSede">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Cancha
+                        </span>
+
+                        <span id="modalCancha">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Cupos disponibles
+                        </span>
+
+                        <span id="modalCupos">
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Costo
+                        </span>
+
+                        <span id="modalCosto">
+                            1 crédito
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="aviso-credito mt-3">
+
+                    Al confirmar la reserva se descontará
+                    un crédito de tu cuenta.
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+
+                <button
+                        type="button"
+                        id="btnReservar"
+                        class="btn btn-success"
+                >
+                    Confirmar reserva
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- LIBRERÍAS Y ARCHIVOS JAVASCRIPT                       -->
+<!-- ===================================================== -->
+
+<!-- FullCalendar -->
+<script
+        src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.21/index.global.min.js"
+></script>
+
+<!-- Idioma español para FullCalendar -->
+<script
+        src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.21/locales/es.global.min.js"
+></script>
+
+<!-- Bootstrap: controla el modal y las notificaciones -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<!-- Barra compartida -->
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<!-- Calendario, reservas, historial y notificaciones -->
+<script
+        th:src="@{/js/inicio/inicio.js}"
+></script>
+
+<!-- Cierre de sesión -->
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>

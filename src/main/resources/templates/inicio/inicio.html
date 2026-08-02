@@ -3,287 +3,492 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
+
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Inicio | Infinity Fútbol</title>
 
+    <!-- Bootstrap -->
     <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
             rel="stylesheet"
     >
 
+    <!-- Barra de navegación compartida -->
     <link
-            th:href="@{/css/inicio/inicio.css}"
+            th:href="@{/css/componentes/navbar.css}"
             rel="stylesheet"
     >
+
+    <style>
+
+        body {
+            margin: 0;
+
+            color: #25352f;
+            background-color: #f4f7f5;
+
+            font-family: Arial, sans-serif;
+        }
+
+        /*
+           BIENVENIDA
+        */
+
+        .panel-bienvenida {
+            padding: 30px;
+
+            background-color: #ffffff;
+
+            border-left: 5px solid #198754;
+            border-radius: 12px;
+
+            box-shadow:
+                    0 5px 18px
+                    rgba(0, 0, 0, 0.06);
+        }
+
+        .panel-bienvenida h1 {
+            margin-bottom: 8px;
+
+            color: #143d2b;
+
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .panel-bienvenida p {
+            margin-bottom: 0;
+
+            color: #66736d;
+        }
+
+        .etiqueta-panel {
+            margin-bottom: 6px !important;
+
+            color: #198754 !important;
+
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.04rem;
+            text-transform: uppercase;
+        }
+
+        /*
+           RESUMEN
+        */
+
+        .tarjeta-resumen-inicio {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            min-height: 125px;
+
+            padding: 24px;
+
+            background-color: #ffffff;
+
+            border: 1px solid #dfe6e2;
+            border-radius: 12px;
+
+            box-shadow:
+                    0 4px 14px
+                    rgba(0, 0, 0, 0.04);
+        }
+
+        .tarjeta-resumen-inicio span {
+            display: block;
+
+            color: #66736d;
+
+            font-size: 0.95rem;
+        }
+
+        .tarjeta-resumen-inicio strong {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #198754;
+
+            font-size: 2rem;
+        }
+
+        .icono-resumen-inicio {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 52px;
+            height: 52px;
+
+            color: #ffffff;
+            background-color: #198754;
+
+            border-radius: 50%;
+
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /*
+           MÓDULOS
+        */
+
+        .titulo-modulos {
+            color: #143d2b;
+
+            font-weight: 700;
+        }
+
+        .tarjeta-modulo {
+            display: flex;
+            flex-direction: column;
+
+            min-height: 220px;
+            height: 100%;
+
+            padding: 25px;
+
+            color: #25352f;
+            background-color: #ffffff;
+
+            border: 1px solid #dfe6e2;
+            border-radius: 12px;
+
+            text-decoration: none;
+
+            box-shadow:
+                    0 4px 14px
+                    rgba(0, 0, 0, 0.04);
+
+            transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease,
+                    border-color 0.2s ease;
+        }
+
+        .tarjeta-modulo:hover {
+            color: #25352f;
+
+            border-color: #198754;
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                    0 10px 25px
+                    rgba(0, 0, 0, 0.09);
+        }
+
+        .icono-modulo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 48px;
+            height: 48px;
+
+            color: #ffffff;
+            background-color: #198754;
+
+            border-radius: 10px;
+
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .tarjeta-modulo h3 {
+            margin-top: 18px;
+            margin-bottom: 8px;
+
+            color: #143d2b;
+
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .tarjeta-modulo p {
+            margin-bottom: 18px;
+
+            color: #66736d;
+
+            line-height: 1.5;
+        }
+
+        .enlace-modulo {
+            margin-top: auto;
+
+            color: #198754;
+
+            font-weight: 700;
+        }
+
+        /*
+           ESTADO DE CARGA
+        */
+
+        .valor-cargando {
+            color: #6c757d !important;
+
+            font-size: 1rem !important;
+        }
+
+        @media (max-width: 767px) {
+
+            .panel-bienvenida {
+                padding: 22px;
+            }
+
+            .panel-bienvenida h1 {
+                font-size: 1.6rem;
+            }
+
+            .tarjeta-resumen-inicio {
+                min-height: 110px;
+            }
+
+            .tarjeta-modulo {
+                min-height: 190px;
+            }
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<header class="barra-principal">
-    <nav class="container py-3">
+<!-- Barra de navegación compartida -->
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
 
-        <div class="d-flex flex-wrap
-                    justify-content-between
-                    align-items-center
-                    gap-3">
+<main class="container py-5">
 
-            <a
-                    th:href="@{/inicio}"
-                    class="marca"
-            >
-                Infinity Fútbol
-            </a>
+    <!-- =============================================== -->
+    <!-- BIENVENIDA                                      -->
+    <!-- =============================================== -->
 
-            <div class="d-flex align-items-center gap-2">
+    <section class="panel-bienvenida">
 
-                <div class="dropdown">
+        <p class="etiqueta-panel">
+            Panel del cliente
+        </p>
 
-                    <button
-                            type="button"
-                            id="btnNotificaciones"
-                            class="btn btn-outline-light boton-notificaciones position-relative"
-                            data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside"
-                            aria-expanded="false"
-                            aria-label="Notificaciones"
-                    >
-        <span
-                class="icono-campana"
-                aria-hidden="true"
-        >
-            🔔
-        </span>
-
-                        <span
-                                id="contadorNotificaciones"
-                                class="position-absolute
-                       top-0
-                       start-100
-                       translate-middle
-                       badge
-                       rounded-pill
-                       bg-danger
-                       d-none"
-                        >
-            0
-        </span>
-                    </button>
-
-                    <div
-                            class="dropdown-menu
-                   dropdown-menu-end
-                   panel-notificaciones
-                   p-0"
-                            aria-labelledby="btnNotificaciones"
-                    >
-                        <div class="encabezado-notificaciones">
-                            <strong>Notificaciones</strong>
-
-                            <button
-                                    type="button"
-                                    id="btnActualizarNotificaciones"
-                                    class="btn btn-sm btn-outline-secondary"
-                            >
-                                Actualizar
-                            </button>
-                        </div>
-
-                        <div
-                                id="listaNotificaciones"
-                                class="lista-notificaciones"
-                        >
-                            <div class="estado-notificaciones">
-                                Cargando notificaciones...
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <a
-                        th:href="@{/inicio/creditos}"
-                        class="btn btn-warning"
-                >
-                    Recargar créditos
-                </a>
-
-                <a
-                        th:href="@{/perfil}"
-                        class="btn btn-outline-light"
-                >
-                    Mi perfil
-                </a>
-
-                <button
-                        id="botonLogout"
-                        type="button"
-                        class="btn btn-light"
-                >
-                    Cerrar sesión
-                </button>
-
-            </div>
-        </div>
-    </nav>
-</header>
-
-<main class="container py-4">
-
-    <section class="mb-4">
-
-        <h1 class="titulo-principal">
+        <h1>
             Bienvenido,
             <span id="nombreCliente">
                 cargando...
             </span>
         </h1>
 
-        <p class="text-muted mb-0">
-            Consulta las clases disponibles y reserva
-            utilizando tus créditos.
+        <p>
+            Consulta el estado de tu cuenta y accede
+            a los diferentes módulos de Infinity Fútbol.
         </p>
 
     </section>
 
-    <section class="row g-3 mb-4">
+    <!-- Mensaje de error -->
+
+    <div
+            id="mensajeInicio"
+            class="alert alert-danger mt-4 d-none"
+            role="alert"
+    ></div>
+
+    <!-- =============================================== -->
+    <!-- RESUMEN                                         -->
+    <!-- =============================================== -->
+
+    <section class="row g-4 mt-2">
 
         <div class="col-md-6">
 
-            <article class="tarjeta-resumen">
+            <article class="tarjeta-resumen-inicio">
 
                 <div>
-                    <p class="etiqueta-resumen">
-                        Créditos disponibles
-                    </p>
 
-                    <p
+                    <span>
+                        Créditos disponibles
+                    </span>
+
+                    <strong
                             id="saldoCreditos"
-                            class="valor-resumen"
+                            class="valor-cargando"
                     >
-                        0
-                    </p>
+                        Cargando...
+                    </strong>
+
                 </div>
 
-                <div class="icono-resumen">
+                <div
+                        class="icono-resumen-inicio"
+                        aria-hidden="true"
+                >
                     C
                 </div>
 
             </article>
+
         </div>
 
         <div class="col-md-6">
 
-            <article class="tarjeta-resumen">
+            <article class="tarjeta-resumen-inicio">
 
                 <div>
-                    <p class="etiqueta-resumen">
-                        Reservas próximas
-                    </p>
 
-                    <p
+                    <span>
+                        Reservas próximas
+                    </span>
+
+                    <strong
                             id="reservasProximas"
-                            class="valor-resumen"
+                            class="valor-cargando"
                     >
-                        0
-                    </p>
+                        Cargando...
+                    </strong>
+
                 </div>
 
-                <div class="icono-resumen">
+                <div
+                        class="icono-resumen-inicio"
+                        aria-hidden="true"
+                >
                     R
                 </div>
 
             </article>
+
         </div>
 
     </section>
 
-    <div
-            id="mensajePagina"
-            class="alert d-none"
-            role="alert"
-    ></div>
+    <!-- =============================================== -->
+    <!-- ACCESOS A MÓDULOS                               -->
+    <!-- =============================================== -->
 
-    <section class="panel-calendario">
+    <section class="mt-5">
 
-        <div class="d-flex flex-wrap
-                    justify-content-between
-                    align-items-center
-                    gap-3
-                    mb-3">
+        <div class="mb-4">
 
-            <div>
-                <h2 class="h4 titulo-seccion mb-1">
-                    Calendario de clases
-                </h2>
-
-                <p class="text-muted mb-0">
-                    Pulsa una clase para consultar sus
-                    detalles y reservar.
-                </p>
-            </div>
-
-            <button
-                    id="btnActualizarCalendario"
-                    type="button"
-                    class="btn btn-outline-secondary"
-            >
-                Actualizar
-            </button>
-
-        </div>
-
-        <div class="leyenda-calendario mb-4">
-
-            <span class="elemento-leyenda">
-                <span class="color-leyenda disponible"></span>
-                Disponible
-            </span>
-
-            <span class="elemento-leyenda">
-                <span class="color-leyenda reservada"></span>
-                Ya reservada
-            </span>
-
-            <span class="elemento-leyenda">
-                <span class="color-leyenda sin-cupos"></span>
-                Sin cupos
-            </span>
-
-        </div>
-
-        <div id="calendario"></div>
-
-    </section>
-
-    <section class="panel-reservas mt-4">
-
-        <div class="mb-3">
-
-            <h2 class="h4 titulo-seccion mb-1">
-                Mis próximas reservas
+            <h2 class="h4 titulo-modulos mb-1">
+                Módulos disponibles
             </h2>
 
             <p class="text-muted mb-0">
-                Consulta las clases que ya tienes confirmadas.
+                Selecciona el módulo al que deseas ingresar.
             </p>
 
         </div>
 
-        <div
-                id="listaReservasProximas"
-                class="row g-3"
-                aria-live="polite"
-        >
+        <div class="row g-4">
 
-            <div class="col-12">
+            <!-- Reservas -->
 
-                <div class="estado-reservas">
-                    Cargando reservas...
-                </div>
+            <div class="col-lg-4 col-md-6">
+
+                <a
+                        th:href="@{/inicio/reservas}"
+                        class="tarjeta-modulo"
+                >
+
+                    <span
+                            class="icono-modulo"
+                            aria-hidden="true"
+                    >
+                        R
+                    </span>
+
+                    <h3>
+                        Reservas
+                    </h3>
+
+                    <p>
+                        Consulta el calendario de clases,
+                        realiza reservas y revisa tus
+                        reservas próximas y pasadas.
+                    </p>
+
+                    <span class="enlace-modulo">
+                        Ingresar a reservas →
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Créditos -->
+
+            <div class="col-lg-4 col-md-6">
+
+                <a
+                        th:href="@{/inicio/creditos}"
+                        class="tarjeta-modulo"
+                >
+
+                    <span
+                            class="icono-modulo"
+                            aria-hidden="true"
+                    >
+                        C
+                    </span>
+
+                    <h3>
+                        Créditos y pagos
+                    </h3>
+
+                    <p>
+                        Compra paquetes de créditos,
+                        consulta tus pagos y visualiza
+                        las boletas generadas.
+                    </p>
+
+                    <span class="enlace-modulo">
+                        Gestionar créditos →
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Perfil -->
+
+            <div class="col-lg-4 col-md-6">
+
+                <a
+                        th:href="@{/perfil}"
+                        class="tarjeta-modulo"
+                >
+
+                    <span
+                            class="icono-modulo"
+                            aria-hidden="true"
+                    >
+                        P
+                    </span>
+
+                    <h3>
+                        Mi perfil
+                    </h3>
+
+                    <p>
+                        Consulta y modifica tus datos
+                        personales, usuario y contraseña.
+                    </p>
+
+                    <span class="enlace-modulo">
+                        Ver mi perfil →
+                    </span>
+
+                </a>
 
             </div>
 
@@ -293,183 +498,139 @@
 
 </main>
 
-<!-- Modal con los detalles de la clase -->
-<div
-        class="modal fade"
-        id="modalClase"
-        tabindex="-1"
-        aria-labelledby="modalTitulo"
-        aria-hidden="true"
->
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-
-                <div>
-                    <span
-                            id="modalSituacion"
-                            class="badge text-bg-success mb-2"
-                    >
-                        Disponible
-                    </span>
-
-                    <h2
-                            id="modalTitulo"
-                            class="modal-title fs-5"
-                    >
-                        Detalles de la clase
-                    </h2>
-                </div>
-
-                <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar"
-                ></button>
-
-            </div>
-
-            <div class="modal-body">
-
-                <div
-                        id="mensajeModal"
-                        class="alert d-none"
-                        role="alert"
-                ></div>
-
-                <p
-                        id="modalDescripcion"
-                        class="text-muted"
-                >
-                    Sin descripción.
-                </p>
-
-                <div class="detalle-clase">
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Fecha
-                        </span>
-
-                        <span id="modalFecha">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Horario
-                        </span>
-
-                        <span id="modalHorario">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Entrenador
-                        </span>
-
-                        <span id="modalEntrenador">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Sede
-                        </span>
-
-                        <span id="modalSede">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Cancha
-                        </span>
-
-                        <span id="modalCancha">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Cupos disponibles
-                        </span>
-
-                        <span id="modalCupos">
-                            -
-                        </span>
-                    </div>
-
-                    <div class="detalle-item">
-                        <span class="detalle-etiqueta">
-                            Costo
-                        </span>
-
-                        <span id="modalCosto">
-                            1 crédito
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="aviso-credito mt-3">
-
-                    Al confirmar la reserva se descontará
-                    un crédito de tu cuenta.
-
-                </div>
-
-            </div>
-
-            <div class="modal-footer">
-
-                <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal"
-                >
-                    Cerrar
-                </button>
-
-                <button
-                        type="button"
-                        id="btnReservar"
-                        class="btn btn-success"
-                >
-                    Confirmar reserva
-                </button>
-
-            </div>
-
-        </div>
-    </div>
-</div>
-
+<!-- Barra de navegación -->
 <script
-        src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.21/index.global.min.js">
-</script>
+        th:src="@{/js/componentes/navbar.js}"
+></script>
 
+<!-- Cierre de sesión -->
 <script
-        src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.21/locales/es.global.min.js">
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+<!-- Carga del resumen del cliente -->
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        cargarResumenInicio
+    );
+
+    async function cargarResumenInicio() {
+
+        const nombreCliente =
+            document.getElementById(
+                "nombreCliente"
+            );
+
+        const saldoCreditos =
+            document.getElementById(
+                "saldoCreditos"
+            );
+
+        const reservasProximas =
+            document.getElementById(
+                "reservasProximas"
+            );
+
+        const mensajeInicio =
+            document.getElementById(
+                "mensajeInicio"
+            );
+
+        try {
+
+            const response = await fetch(
+                "/api/inicio/resumen",
+                {
+                    method: "GET",
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }
+            );
+
+            if (!response.ok) {
+
+                throw new Error(
+                    await obtenerMensajeErrorInicio(
+                        response
+                    )
+                );
+            }
+
+            const resumen =
+                await response.json();
+
+            nombreCliente.textContent =
+                resumen.nombreCompleto
+                ?? "cliente";
+
+            saldoCreditos.textContent =
+                resumen.saldoCreditos
+                ?? 0;
+
+            reservasProximas.textContent =
+                resumen.reservasProximas
+                ?? 0;
+
+            saldoCreditos.classList.remove(
+                "valor-cargando"
+            );
+
+            reservasProximas.classList.remove(
+                "valor-cargando"
+            );
+
+        } catch (error) {
+
+            nombreCliente.textContent =
+                "cliente";
+
+            saldoCreditos.textContent =
+                "-";
+
+            reservasProximas.textContent =
+                "-";
+
+            mensajeInicio.textContent =
+                error.message;
+
+            mensajeInicio.classList.remove(
+                "d-none"
+            );
+        }
+    }
+
+    async function obtenerMensajeErrorInicio(
+        response
+    ) {
+
+        const contenido =
+            await response.text();
+
+        if (!contenido) {
+            return "No se pudo cargar el resumen de la cuenta.";
+        }
+
+        try {
+
+            const error =
+                JSON.parse(contenido);
+
+            return error.detail
+                ?? error.message
+                ?? "No se pudo cargar el resumen de la cuenta.";
+
+        } catch (error) {
+
+            return "No se pudo cargar el resumen de la cuenta.";
+        }
+    }
+
 </script>
-
-<script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-</script>
-
-<script th:src="@{/js/inicio/inicio.js}"></script>
-
-<script th:src="@{/js/auth/logout.js}"></script>
 
 </body>
 </html>

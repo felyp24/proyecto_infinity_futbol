@@ -738,4 +738,63 @@ body {
         color: #6c757d;
         font-size: 0.78rem;
     }
+
+    .historial-paginacion {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .historial-paginacion > div {
+        display: flex;
+    }
+
+    .historial-paginacion button {
+        flex: 1;
+    }
+}
+
+/*
+   HISTORIAL DE RESERVAS
+*/
+
+.panel-historial {
+    border-top: 4px solid #6c757d;
+}
+
+.tarjeta-reserva-pasada {
+    border-left-color: #6c757d;
+
+    background-color: #fbfbfb;
+}
+
+.tarjeta-reserva-pasada:hover {
+    border-left-color: #495057;
+}
+
+.estado-historial-finalizada {
+    color: #41464b;
+    background-color: #e2e3e5;
+}
+
+.estado-historial-cancelada {
+    color: #842029;
+    background-color: #f8d7da;
+}
+
+.identificador-reserva {
+    color: #6c757d;
+
+    font-size: 0.75rem;
+}
+
+.historial-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #eceff1;
 }

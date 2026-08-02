@@ -7,6 +7,10 @@ let calendario;
 let modalClase;
 let claseSeleccionada = null;
 let saldoActual = 0;
+let paginaHistorialActual = 0;
+let totalPaginasHistorial = 0;
+
+const TAMANO_PAGINA_HISTORIAL = 6;
 
 const nombreCliente =
     document.getElementById("nombreCliente");
@@ -32,6 +36,32 @@ const listaReservasProximas =
     document.getElementById(
         "listaReservasProximas"
     );
+
+const listaReservasPasadas =
+    document.getElementById(
+        "listaReservasPasadas"
+    );
+
+const btnActualizarHistorial =
+    document.getElementById(
+        "btnActualizarHistorial"
+    );
+
+const btnHistorialAnterior =
+    document.getElementById(
+        "btnHistorialAnterior"
+    );
+
+const btnHistorialSiguiente =
+    document.getElementById(
+        "btnHistorialSiguiente"
+    );
+
+const informacionPaginaHistorial =
+    document.getElementById(
+        "informacionPaginaHistorial"
+    );
+
 const contadorNotificaciones =
     document.getElementById(
         "contadorNotificaciones"
@@ -66,6 +96,48 @@ async function iniciarPagina() {
         manejarAccionReserva
     );
 
+    btnActualizarHistorial.addEventListener(
+        "click",
+        async () => {
+
+            paginaHistorialActual = 0;
+
+            await cargarReservasPasadas();
+        }
+    );
+
+    btnHistorialAnterior.addEventListener(
+        "click",
+        async () => {
+
+            if (paginaHistorialActual <= 0) {
+                return;
+            }
+
+            paginaHistorialActual--;
+
+            await cargarReservasPasadas();
+        }
+    );
+
+    btnHistorialSiguiente.addEventListener(
+        "click",
+        async () => {
+
+            if (
+                totalPaginasHistorial === 0
+                || paginaHistorialActual
+                    >= totalPaginasHistorial - 1
+            ) {
+                return;
+            }
+
+            paginaHistorialActual++;
+
+            await cargarReservasPasadas();
+        }
+    );
+
     listaNotificaciones.addEventListener(
         "click",
         manejarClickNotificacion
@@ -79,6 +151,7 @@ async function iniciarPagina() {
     await Promise.all([
         cargarResumen(),
         cargarReservasProximas(),
+        cargarReservasPasadas(),
         cargarNotificaciones()
     ]);
 
@@ -571,7 +644,8 @@ async function actualizarCalendario() {
     try {
         await Promise.all([
             cargarResumen(),
-            cargarReservasProximas()
+            cargarReservasProximas(),
+            cargarReservasPasadas()
         ]);
 
         calendario.refetchEvents();
@@ -1262,4 +1336,293 @@ function escaparHtmlNotificacion(
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+}
+
+async function cargarReservasPasadas() {
+
+    listaReservasPasadas.innerHTML = `
+        <div class="col-12">
+            <div class="estado-reservas">
+                Cargando historial...
+            </div>
+        </div>
+    `;
+
+    const parametros =
+        new URLSearchParams({
+            page: paginaHistorialActual,
+            size: TAMANO_PAGINA_HISTORIAL
+        });
+
+    try {
+
+        const response = await fetch(
+            `/api/inicio/reservas/historial?${parametros.toString()}`,
+            {
+                credentials: "same-origin"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                await obtenerMensajeError(
+                    response
+                )
+            );
+        }
+
+        const pagina =
+            await response.json();
+
+        paginaHistorialActual =
+            Number.isInteger(pagina.number)
+                ? pagina.number
+                : 0;
+
+        totalPaginasHistorial =
+            Number.isInteger(pagina.totalPages)
+                ? pagina.totalPages
+                : 0;
+
+        const reservas =
+            Array.isArray(pagina.content)
+                ? pagina.content
+                : [];
+
+        mostrarReservasPasadas(
+            reservas
+        );
+
+        actualizarPaginacionHistorial();
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar historial de reservas:",
+            error
+        );
+
+        listaReservasPasadas.innerHTML = `
+            <div class="col-12">
+
+                <div class="alert alert-danger mb-0">
+                    ${escaparHtml(error.message)}
+                </div>
+
+            </div>
+        `;
+    }
+}
+
+function mostrarReservasPasadas(
+    reservas
+) {
+
+    if (
+        !Array.isArray(reservas)
+        || reservas.length === 0
+    ) {
+        listaReservasPasadas.innerHTML = `
+            <div class="col-12">
+
+                <div class="estado-reservas">
+                    Todavía no tienes reservas pasadas.
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+    listaReservasPasadas.innerHTML =
+        reservas
+            .map(reserva => `
+                <div class="col-lg-6">
+
+                    <article class="
+                        tarjeta-reserva
+                        tarjeta-reserva-pasada
+                    ">
+
+                        <div class="encabezado-reserva">
+
+                            <h3 class="titulo-reserva">
+                                ${escaparHtml(
+                                    reserva.titulo
+                                )}
+                            </h3>
+
+                            <span class="
+                                estado-reserva
+                                ${obtenerClaseSituacionHistorial(
+                                    reserva.situacion
+                                )}
+                            ">
+                                ${formatearSituacionHistorial(
+                                    reserva.situacion
+                                )}
+                            </span>
+
+                        </div>
+
+                        <div class="fecha-reserva-clase">
+
+                            ${formatearFechaISO(
+                                reserva.fechaClase
+                            )}
+
+                            ·
+
+                            ${formatearHoraTexto(
+                                reserva.horaInicio
+                            )}
+
+                            -
+
+                            ${formatearHoraTexto(
+                                reserva.horaFin
+                            )}
+
+                        </div>
+
+                        <div class="detalles-reserva">
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Entrenador
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.nombreEntrenador
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Sede
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.nombreSede
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Distrito
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    ${escaparHtml(
+                                        reserva.distrito
+                                    )}
+                                </span>
+
+                            </div>
+
+                            <div class="detalle-reserva">
+
+                                <span class="detalle-reserva-etiqueta">
+                                    Cancha
+                                </span>
+
+                                <span class="detalle-reserva-valor">
+                                    Cancha ${
+                                        reserva.numeroCancha ?? "-"
+                                    }
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="pie-reserva">
+
+                            <span class="creditos-reserva">
+
+                                Créditos utilizados:
+                                ${reserva.creditosUsados ?? 0}
+
+                            </span>
+
+                            <span class="identificador-reserva">
+
+                                ${escaparHtml(
+                                    reserva.idReserva
+                                )}
+
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                </div>
+            `)
+            .join("");
+}
+
+function formatearSituacionHistorial(
+    situacion
+) {
+
+    const nombres = {
+        FINALIZADA:
+            "Clase finalizada",
+
+        RESERVA_CANCELADA:
+            "Reserva cancelada",
+
+        CLASE_CANCELADA:
+            "Clase cancelada"
+    };
+
+    return nombres[situacion]
+        ?? "Finalizada";
+}
+
+function obtenerClaseSituacionHistorial(
+    situacion
+) {
+
+    if (situacion === "FINALIZADA") {
+        return "estado-historial-finalizada";
+    }
+
+    return "estado-historial-cancelada";
+}
+
+function actualizarPaginacionHistorial() {
+
+    if (totalPaginasHistorial === 0) {
+
+        informacionPaginaHistorial
+            .textContent =
+            "Página 0 de 0";
+
+    } else {
+
+        informacionPaginaHistorial
+            .textContent =
+            `Página ${paginaHistorialActual + 1} `
+            + `de ${totalPaginasHistorial}`;
+    }
+
+    btnHistorialAnterior.disabled =
+        paginaHistorialActual <= 0;
+
+    btnHistorialSiguiente.disabled =
+        totalPaginasHistorial === 0
+        || paginaHistorialActual
+            >= totalPaginasHistorial - 1;
 }

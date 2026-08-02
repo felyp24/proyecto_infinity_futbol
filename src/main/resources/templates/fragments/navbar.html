@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<nav
+        th:fragment="navbar"
+        th:if="${navAutenticado}"
+        class="nav-app"
+        data-nav-app
+>
+
+    <div class="nav-app-contenedor">
+
+        <a
+                class="nav-app-marca"
+                th:href="${navRutaInicio}"
+        >
+            Infinity Fútbol
+        </a>
+
+        <button
+                type="button"
+                class="nav-app-movil"
+                aria-label="Abrir menú"
+                aria-expanded="false"
+                data-nav-movil
+        >
+            ☰
+        </button>
+
+        <div
+                class="nav-app-menu"
+                data-nav-menu
+        >
+
+            <a
+                    class="nav-app-enlace"
+                    th:classappend="${
+                        navRutaActual == navRutaInicio
+                    } ? ' nav-app-activo' : ''"
+                    th:href="${navRutaInicio}"
+            >
+                Principal
+            </a>
+
+            <!-- Módulos del cliente -->
+
+            <div
+                    class="nav-app-desplegable"
+                    th:if="${navEsUsuario}"
+            >
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Reservas
+                    <span>▾</span>
+                </button>
+
+                <div class="nav-app-submenu">
+
+                    <a
+                            th:href="@{
+                                /inicio/reservas
+                                #calendarioReservas
+                            }"
+                    >
+                        Calendario de clases
+                    </a>
+
+                    <a
+                            th:href="@{
+                                /inicio/reservas
+                                #reservasProximas
+                            }"
+                    >
+                        Próximas reservas
+                    </a>
+
+                    <a
+                            th:href="@{
+                                /inicio/reservas
+                                #historialReservas
+                            }"
+                    >
+                        Historial de reservas
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div
+                    class="nav-app-desplegable"
+                    th:if="${navEsUsuario}"
+            >
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Créditos
+                    <span>▾</span>
+                </button>
+
+                <div class="nav-app-submenu">
+
+                    <a th:href="@{/inicio/creditos}">
+                        Recargar créditos
+                    </a>
+
+                    <a
+                            th:href="@{
+                                /inicio/creditos
+                                #historialPagos
+                            }"
+                    >
+                        Historial de pagos
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Módulo de coordinador -->
+
+            <div
+                    class="nav-app-desplegable"
+                    th:if="${navPuedeGestionarClases}"
+            >
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Clases
+                    <span>▾</span>
+                </button>
+
+                <div class="nav-app-submenu">
+
+                    <a th:href="@{/coordinador/clases}">
+                        Gestión de clases
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Módulos administrativos -->
+
+            <div
+                    class="nav-app-desplegable"
+                    th:if="${navEsAdministrador}"
+            >
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Administración
+                    <span>▾</span>
+                </button>
+
+                <div class="nav-app-submenu">
+
+                    <a th:href="@{/admin/roles}">
+                        Roles y permisos
+                    </a>
+
+                    <a th:href="@{/admin/alumnos}">
+                        Lista de alumnos
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div
+                    class="nav-app-desplegable"
+                    th:if="${navEsAdministrador}"
+            >
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Gestión de créditos
+                    <span>▾</span>
+                </button>
+
+                <div class="nav-app-submenu">
+
+                    <a th:href="@{/admin/creditos}">
+                        Editar créditos
+                    </a>
+
+                    <a
+                            th:href="@{
+                                /admin/creditos/historial
+                            }"
+                    >
+                        Historial de ajustes
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Cuenta disponible para cualquier rol -->
+
+            <div class="nav-app-desplegable">
+
+                <button
+                        type="button"
+                        class="nav-app-enlace
+                               nav-app-boton-desplegable"
+                        aria-expanded="false"
+                >
+                    Cuenta
+                    <span>▾</span>
+                </button>
+
+                <div
+                        class="nav-app-submenu
+                               nav-app-submenu-derecha"
+                >
+
+                    <div class="nav-app-usuario">
+
+                        <strong
+                                th:text="${navUsuario}"
+                        >
+                            usuario
+                        </strong>
+
+                        <span
+                                th:text="${
+                                    #strings.listJoin(
+                                        navRoles,
+                                        ', '
+                                    )
+                                }"
+                        >
+                            USUARIO
+                        </span>
+
+                    </div>
+
+                    <a th:href="@{/perfil}">
+                        Mi perfil
+                    </a>
+
+                    <a th:href="@{/perfil/seguridad}">
+                        Usuario y contraseña
+                    </a>
+
+                    <button
+                            type="button"
+                            id="botonLogout"
+                            class="nav-app-cerrar-sesion"
+                    >
+                        Cerrar sesión
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
+
+</body>
+</html>

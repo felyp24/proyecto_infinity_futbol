@@ -26,6 +26,9 @@ import java.util.UUID;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import com.infinityfutbol.dto.response.ReservaHistorialResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ReservaService {
@@ -423,6 +426,97 @@ public class ReservaService {
                 reserva.getCreditosUsados(),
                 reserva.getEstado()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReservaHistorialResponse>
+    listarReservasPasadas(
+            String idUsuario,
+            Pageable pageable
+    ) {
+        return reservaRepository
+                .listarReservasPasadas(
+                        idUsuario,
+                        LocalDate.now(),
+                        LocalTime.now(),
+                        pageable
+                )
+                .map(
+                        this::convertirReservaHistorial
+                );
+    }
+
+    private ReservaHistorialResponse
+    convertirReservaHistorial(
+            Reserva reserva
+    ) {
+        Clase clase =
+                reserva.getClase();
+
+        String nombreEntrenador =
+                (
+                        clase.getEntrenador()
+                                .getNombres()
+                                + " "
+                                + clase.getEntrenador()
+                                .getApellidos()
+                ).trim();
+
+        String situacion =
+                determinarSituacionHistorial(
+                        reserva,
+                        clase
+                );
+
+        return new ReservaHistorialResponse(
+                reserva.getIdReserva(),
+                clase.getIdClase(),
+                clase.getTitulo(),
+
+                clase.getFechaClase(),
+                clase.getHoraInicio(),
+                clase.getHoraFin(),
+
+                clase.getCancha()
+                        .getSede()
+                        .getNombre(),
+
+                clase.getCancha()
+                        .getSede()
+                        .getDistrito()
+                        .getNombre(),
+
+                clase.getCancha()
+                        .getNumeroCancha(),
+
+                nombreEntrenador,
+
+                reserva.getCreditosUsados(),
+                reserva.getEstado(),
+
+                situacion
+        );
+    }
+
+    private String determinarSituacionHistorial(
+            Reserva reserva,
+            Clase clase
+    ) {
+        if (
+                reserva.getEstado()
+                        == EstadoReserva.CANCELADA
+        ) {
+            return "RESERVA_CANCELADA";
+        }
+
+        if (
+                clase.getEstado()
+                        == EstadoClase.CANCELADA
+        ) {
+            return "CLASE_CANCELADA";
+        }
+
+        return "FINALIZADA";
     }
 
     @Transactional

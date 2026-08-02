@@ -10,4 +10,9 @@ public class InicioWebController {
     public String mostrarInicio() {
         return "inicio/inicio";
     }
+
+    @GetMapping("/inicio/reservas")
+    public String mostrarModuloReservas() {
+        return "inicio/reservas";
+    }
 }

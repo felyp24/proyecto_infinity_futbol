@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalTime;
 
@@ -139,5 +141,40 @@ public interface ReservaRepository
 
             @Param("idUsuario")
             String idUsuario
+    );
+
+    @EntityGraph(attributePaths = {
+            "clase",
+            "clase.cancha",
+            "clase.cancha.sede",
+            "clase.cancha.sede.distrito",
+            "clase.entrenador"
+    })
+    @Query("""
+        SELECT r
+        FROM Reserva r
+        WHERE r.alumno.usuario.idUsuario = :idUsuario
+          AND (
+                r.clase.fechaClase < :fechaActual
+                OR (
+                    r.clase.fechaClase = :fechaActual
+                    AND r.clase.horaFin <= :horaActual
+                )
+          )
+        ORDER BY
+            r.clase.fechaClase DESC,
+            r.clase.horaInicio DESC
+        """)
+    Page<Reserva> listarReservasPasadas(
+            @Param("idUsuario")
+            String idUsuario,
+
+            @Param("fechaActual")
+            LocalDate fechaActual,
+
+            @Param("horaActual")
+            LocalTime horaActual,
+
+            Pageable pageable
     );
 }

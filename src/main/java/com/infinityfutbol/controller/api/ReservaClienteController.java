@@ -15,6 +15,10 @@ import com.infinityfutbol.dto.response.ReservaProximaResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import com.infinityfutbol.dto.response.ReservaHistorialResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 
 @RestController
 @RequestMapping("/api/inicio/reservas")
@@ -66,5 +70,22 @@ public class ReservaClienteController {
                 usuarioAutenticado.getIdUsuario(),
                 idReserva
         );
+    }
+
+    @GetMapping("/historial")
+    public Page<ReservaHistorialResponse>
+    listarReservasPasadas(
+            @AuthenticationPrincipal
+            CustomUserDetails usuarioAutenticado,
+
+            @PageableDefault(size = 6)
+            Pageable pageable
+    ) {
+        return reservaService
+                .listarReservasPasadas(
+                        usuarioAutenticado
+                                .getIdUsuario(),
+                        pageable
+                );
     }
 }
