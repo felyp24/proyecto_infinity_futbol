@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
+import com.infinityfutbol.entity.enums.EstadoPago;
+import java.time.LocalDateTime;
 
 public interface PagoRepository
         extends JpaRepository<Pago, String> {
@@ -74,5 +76,30 @@ public interface PagoRepository
 
             @Param("idUsuario")
             String idUsuario
+    );
+
+    @EntityGraph(attributePaths = {
+            "alumno",
+            "alumno.usuario",
+            "paqueteCredito"
+    })
+    @Query("""
+    SELECT p
+    FROM Pago p
+    WHERE p.estadoPago = :estadoPago
+      AND p.fechaAprobacion IS NOT NULL
+      AND p.fechaAprobacion >= :fechaInicio
+      AND p.fechaAprobacion < :fechaFinExclusiva
+    ORDER BY p.fechaAprobacion ASC
+    """)
+    List<Pago> listarIngresosAprobados(
+            @Param("estadoPago")
+            EstadoPago estadoPago,
+
+            @Param("fechaInicio")
+            LocalDateTime fechaInicio,
+
+            @Param("fechaFinExclusiva")
+            LocalDateTime fechaFinExclusiva
     );
 }

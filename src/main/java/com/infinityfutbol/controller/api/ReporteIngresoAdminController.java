@@ -1,0 +1,118 @@
+package com.infinityfutbol.controller.api;
+
+import com.infinityfutbol.dto.response.ReporteIngresoResponse;
+import com.infinityfutbol.service.ReporteIngresoPdfService;
+import com.infinityfutbol.service.ReporteIngresoService;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+@RestController
+@RequestMapping("/api/admin/reportes/ingresos")
+@PreAuthorize("hasRole('ADMINISTRADOR')")
+public class ReporteIngresoAdminController {
+
+    private final ReporteIngresoService
+            reporteIngresoService;
+
+    private final ReporteIngresoPdfService
+            reporteIngresoPdfService;
+
+    public ReporteIngresoAdminController(
+            ReporteIngresoService
+                    reporteIngresoService,
+
+            ReporteIngresoPdfService
+                    reporteIngresoPdfService
+    ) {
+        this.reporteIngresoService =
+                reporteIngresoService;
+
+        this.reporteIngresoPdfService =
+                reporteIngresoPdfService;
+    }
+
+    @GetMapping
+    public ReporteIngresoResponse obtenerReporte(
+            @RequestParam
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate fechaInicio,
+
+            @RequestParam
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate fechaFin
+    ) {
+        return reporteIngresoService
+                .generarReporte(
+                        fechaInicio,
+                        fechaFin
+                );
+    }
+
+    @GetMapping(
+            value = "/pdf",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    public ResponseEntity<byte[]> exportarPdf(
+            @RequestParam
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate fechaInicio,
+
+            @RequestParam
+            @DateTimeFormat(
+                    iso = DateTimeFormat.ISO.DATE
+            )
+            LocalDate fechaFin
+    ) {
+        byte[] pdf =
+                reporteIngresoPdfService
+                        .generarPdf(
+                                fechaInicio,
+                                fechaFin
+                        );
+
+        String nombreArchivo =
+                "reporte-ingresos-"
+                        + fechaInicio.format(
+                        DateTimeFormatter.ISO_DATE
+                )
+                        + "-a-"
+                        + fechaFin.format(
+                        DateTimeFormatter.ISO_DATE
+                )
+                        + ".pdf";
+
+        return ResponseEntity
+                .ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\""
+                                + nombreArchivo
+                                + "\""
+                )
+                .contentType(
+                        MediaType.APPLICATION_PDF
+                )
+                .contentLength(
+                        pdf.length
+                )
+                .body(
+                        pdf
+                );
+    }
+}
