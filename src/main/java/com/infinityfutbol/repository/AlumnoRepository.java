@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import com.infinityfutbol.entity.enums.EstadoAlumno;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 
@@ -50,4 +52,65 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
     @Override
     @EntityGraph(attributePaths = "usuario")
     Optional<Alumno> findById(String idAlumno);
+
+    @EntityGraph(attributePaths = {
+            "usuario"
+    })
+    @Query("""
+    SELECT a
+    FROM Alumno a
+    WHERE a.fechaRegistro >= :fechaInicio
+      AND a.fechaRegistro < :fechaFinExclusiva
+
+      AND (
+            :estado IS NULL
+            OR a.estado = :estado
+      )
+
+      AND (
+            :texto = ''
+
+            OR LOWER(a.nombres)
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+
+            OR LOWER(a.apellidos)
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+
+            OR LOWER(
+                CONCAT(
+                    a.nombres,
+                    CONCAT(' ', a.apellidos)
+                )
+            )
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+
+            OR LOWER(a.numeroDocumento)
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+
+            OR LOWER(a.usuario.username)
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+
+            OR LOWER(a.usuario.correo)
+                LIKE LOWER(CONCAT('%', :texto, '%'))
+      )
+
+    ORDER BY
+        a.fechaRegistro DESC,
+        a.apellidos ASC,
+        a.nombres ASC
+    """)
+    List<Alumno> buscarParaReporteMatriculados(
+
+            @Param("fechaInicio")
+            LocalDateTime fechaInicio,
+
+            @Param("fechaFinExclusiva")
+            LocalDateTime fechaFinExclusiva,
+
+            @Param("texto")
+            String texto,
+
+            @Param("estado")
+            EstadoAlumno estado
+    );
 }

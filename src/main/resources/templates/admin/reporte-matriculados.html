@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Reporte de matriculados | Infinity Fútbol
+    </title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/admin/reporte-matriculados.css}"
+            rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="reporte-contenedor">
+
+    <header class="reporte-encabezado">
+
+        <h1>
+            Reporte de alumnos matriculados
+        </h1>
+
+        <p>
+            Consulta los alumnos registrados en el sistema
+            y exporta el resultado a PDF.
+        </p>
+
+    </header>
+
+    <section class="reporte-panel">
+
+        <form
+                id="formularioReporte"
+                class="reporte-filtros"
+        >
+
+            <div class="reporte-campo">
+
+                <label for="fechaInicio">
+                    Fecha inicial
+                </label>
+
+                <input
+                        id="fechaInicio"
+                        type="date"
+                        required
+                >
+
+            </div>
+
+            <div class="reporte-campo">
+
+                <label for="fechaFin">
+                    Fecha final
+                </label>
+
+                <input
+                        id="fechaFin"
+                        type="date"
+                        required
+                >
+
+            </div>
+
+            <div class="reporte-campo">
+
+                <label for="estadoAlumno">
+                    Estado del alumno
+                </label>
+
+                <select id="estadoAlumno">
+
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="ACTIVO">
+                        Activos
+                    </option>
+
+                    <option value="INACTIVO">
+                        Inactivos
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div
+                    class="reporte-campo
+                           reporte-campo-busqueda"
+            >
+
+                <label for="textoBusqueda">
+                    Buscar alumno
+                </label>
+
+                <input
+                        id="textoBusqueda"
+                        type="search"
+                        maxlength="100"
+                        autocomplete="off"
+                        placeholder="Nombre, documento, usuario o correo"
+                >
+
+            </div>
+
+            <button
+                    type="submit"
+                    class="btn btn-success"
+            >
+                Generar reporte
+            </button>
+
+            <button
+                    id="botonExportarPdf"
+                    type="button"
+                    class="btn btn-outline-danger"
+            >
+                Exportar PDF
+            </button>
+
+        </form>
+
+        <div
+                id="mensajeReporte"
+                class="alert alert-info"
+                role="alert"
+        >
+            Cargando reporte...
+        </div>
+
+        <div
+                id="contenidoReporte"
+                class="oculto"
+        >
+
+            <div class="reporte-resumen">
+
+                <article class="reporte-tarjeta">
+
+                    <span>
+                        Total matriculados
+                    </span>
+
+                    <strong id="totalMatriculados">
+                        0
+                    </strong>
+
+                </article>
+
+                <article class="reporte-tarjeta">
+
+                    <span>
+                        Matriculados activos
+                    </span>
+
+                    <strong id="matriculadosActivos">
+                        0
+                    </strong>
+
+                </article>
+
+                <article class="reporte-tarjeta">
+
+                    <span>
+                        Matriculados inactivos
+                    </span>
+
+                    <strong id="matriculadosInactivos">
+                        0
+                    </strong>
+
+                </article>
+
+            </div>
+
+            <h2 class="reporte-titulo">
+                Detalle de matriculados
+            </h2>
+
+            <div class="tabla-contenedor">
+
+                <table class="tabla-matriculados">
+
+                    <thead>
+
+                    <tr>
+                        <th>Fecha de registro</th>
+                        <th>Alumno</th>
+                        <th>Documento</th>
+                        <th>Fecha de nacimiento</th>
+                        <th>Contacto</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody id="tablaMatriculados">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<script
+        th:src="@{/js/admin/reporte-matriculados.js}"
+></script>
+
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>

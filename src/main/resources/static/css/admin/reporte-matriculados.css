@@ -1,0 +1,280 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    color: #26352f;
+    background-color: #f4f7f5;
+
+    font-family: Arial, sans-serif;
+}
+
+.reporte-contenedor {
+    width: 95%;
+    max-width: 1450px;
+
+    margin: 35px auto;
+}
+
+.reporte-encabezado {
+    margin-bottom: 24px;
+}
+
+.reporte-encabezado h1 {
+    margin: 0 0 7px;
+
+    color: #143d2b;
+
+    font-size: 2rem;
+}
+
+.reporte-encabezado p {
+    margin: 0;
+
+    color: #68756f;
+}
+
+.reporte-panel {
+    padding: 24px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dfe6e2;
+    border-radius: 12px;
+
+    box-shadow:
+            0 5px 18px
+            rgba(0, 0, 0, 0.05);
+}
+
+.reporte-filtros {
+    display: grid;
+
+    grid-template-columns:
+            minmax(160px, 0.8fr)
+            minmax(160px, 0.8fr)
+            minmax(180px, 0.8fr)
+            minmax(270px, 1.4fr)
+            auto
+            auto;
+
+    align-items: end;
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+.reporte-campo {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.reporte-campo label {
+    color: #34423c;
+
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.reporte-campo input,
+.reporte-campo select {
+    min-height: 42px;
+
+    padding: 9px 11px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #bdc7c2;
+    border-radius: 6px;
+}
+
+.reporte-campo input:focus,
+.reporte-campo select:focus {
+    outline: none;
+
+    border-color: #198754;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(25, 135, 84, 0.12);
+}
+
+.oculto {
+    display: none !important;
+}
+
+.reporte-resumen {
+    display: grid;
+
+    grid-template-columns:
+            repeat(
+                    3,
+                    minmax(180px, 1fr)
+            );
+
+    gap: 15px;
+
+    margin-bottom: 27px;
+}
+
+.reporte-tarjeta {
+    padding: 20px;
+
+    background-color: #f7faf8;
+
+    border-left: 4px solid #198754;
+    border-radius: 8px;
+}
+
+.reporte-tarjeta span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #68756f;
+
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.reporte-tarjeta strong {
+    color: #143d2b;
+
+    font-size: 1.6rem;
+}
+
+.reporte-titulo {
+    margin: 0 0 14px;
+
+    color: #143d2b;
+
+    font-size: 1.25rem;
+}
+
+.tabla-contenedor {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.tabla-matriculados {
+    width: 100%;
+    min-width: 1200px;
+
+    border-collapse: collapse;
+}
+
+.tabla-matriculados th,
+.tabla-matriculados td {
+    padding: 12px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    border-bottom: 1px solid #e1e7e4;
+
+    font-size: 0.85rem;
+}
+
+.tabla-matriculados th {
+    color: #34423c;
+    background-color: #f5f8f6;
+}
+
+.tabla-matriculados tbody tr:hover {
+    background-color: #f8fbf9;
+}
+
+.dato-principal {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #25352f;
+
+    font-weight: 700;
+}
+
+.dato-secundario {
+    display: block;
+
+    color: #6c757d;
+
+    font-size: 0.75rem;
+}
+
+.estado {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 15px;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.estado-activo {
+    color: #0f5132;
+    background-color: #d1e7dd;
+}
+
+.estado-inactivo {
+    color: #842029;
+    background-color: #f8d7da;
+}
+
+.sin-resultados {
+    padding: 30px !important;
+
+    color: #6c757d;
+
+    text-align: center !important;
+}
+
+@media (max-width: 1200px) {
+
+    .reporte-filtros {
+        grid-template-columns:
+                repeat(
+                        2,
+                        minmax(0, 1fr)
+                );
+    }
+
+    .reporte-campo-busqueda {
+        grid-column:
+                1 / -1;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .reporte-contenedor {
+        width: 94%;
+
+        margin: 24px auto;
+    }
+
+    .reporte-panel {
+        padding: 16px;
+    }
+
+    .reporte-filtros,
+    .reporte-resumen {
+        grid-template-columns: 1fr;
+    }
+
+    .reporte-campo-busqueda {
+        grid-column: auto;
+    }
+
+    .reporte-filtros button {
+        width: 100%;
+    }
+}
