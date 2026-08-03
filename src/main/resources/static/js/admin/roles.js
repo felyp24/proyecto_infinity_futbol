@@ -221,83 +221,214 @@ function crearCeldaAcceso(usuario) {
     return celda;
 }
 
-async function guardarCambioRol(idUsuario, boton) {
-    const selector = document.getElementById(
-        `rol-${idUsuario}`
+async function obtenerCsrfActual() {
+
+    const response = await fetch(
+        "/api/csrf",
+        {
+            method: "GET",
+
+            credentials:
+                "same-origin",
+
+            cache:
+                "no-store",
+
+            headers: {
+                "Accept":
+                    "application/json"
+            }
+        }
     );
 
-    const nuevoRol = selector.value;
+    if (!response.ok) {
+
+        throw new Error(
+            "No se pudo obtener el token de seguridad."
+        );
+    }
+
+    return response.json();
+}
+
+async function guardarCambioRol(
+    idUsuario,
+    boton
+) {
+
+    const selector =
+        document.getElementById(
+            `rol-${idUsuario}`
+        );
+
+    const nuevoRol =
+        selector.value;
+
     const mensajeEstado =
-        document.getElementById("mensajeEstado");
+        document.getElementById(
+            "mensajeEstado"
+        );
 
     boton.disabled = true;
     boton.textContent = "Guardando...";
 
     try {
+
+        /*
+         * Se solicita un token actualizado
+         * inmediatamente antes del PUT.
+         */
+        const csrfActual =
+            await obtenerCsrfActual();
+
         const response = await fetch(
-            `/api/admin/usuarios/${idUsuario}/rol`,
+            `/api/admin/usuarios/${
+                encodeURIComponent(idUsuario)
+            }/rol`,
             {
-                method: "PUT",
+                method:
+                    "PUT",
+
+                credentials:
+                    "same-origin",
+
+                cache:
+                    "no-store",
+
                 headers: {
-                    "Content-Type": "application/json",
-                    [csrfData.headerName]: csrfData.token
+                    "Content-Type":
+                        "application/json",
+
+                    "Accept":
+                        "application/json",
+
+                    [csrfActual.headerName]:
+                        csrfActual.token
                 },
+
                 body: JSON.stringify({
-                    rol: nuevoRol
+                    rol:
+                        nuevoRol
                 })
             }
         );
 
         if (!response.ok) {
-            let mensajeError =
-                "No se pudo actualizar el rol.";
 
-            if (response.status === 409) {
-                mensajeError =
-                    "No puedes retirar tu propio rol de administrador.";
-            }
-
-            if (response.status === 404) {
-                mensajeError =
-                    "El usuario solicitado no existe.";
-            }
-
-            if (response.status === 400) {
-                mensajeError =
-                    "El rol seleccionado no es válido.";
-            }
-
-            if (response.status === 403) {
-                mensajeError =
-                    "No tienes permisos para realizar esta operación.";
-            }
-
-            throw new Error(mensajeError);
+            throw new Error(
+                await obtenerMensajeCambioRol(
+                    response
+                )
+            );
         }
 
-        const usuarioActualizado = await response.json();
+        const usuarioActualizado =
+            await response.json();
 
         mensajeEstado.textContent =
-            `El rol de ${usuarioActualizado.username} fue actualizado a ${nuevoRol}.`;
+            `El rol de ${
+                usuarioActualizado.username
+            } fue actualizado a ${
+                nuevoRol
+            }.`;
 
         mensajeEstado.classList.remove(
             "oculto",
             "mensaje-error"
         );
 
+        mensajeEstado.classList.add(
+            "mensaje-exito"
+        );
+
+        /*
+         * Volvemos a cargar la información para
+         * reflejar los roles guardados en la base de datos.
+         */
+        await cargarInformacion();
+
     } catch (error) {
-        console.error(error);
 
-        mensajeEstado.textContent = error.message;
+        console.error(
+            "Error al cambiar el rol:",
+            error
+        );
 
-        mensajeEstado.classList.remove("oculto");
-        mensajeEstado.classList.add("mensaje-error");
+        mensajeEstado.textContent =
+            error.message;
+
+        mensajeEstado.classList.remove(
+            "oculto",
+            "mensaje-exito"
+        );
+
+        mensajeEstado.classList.add(
+            "mensaje-error"
+        );
 
     } finally {
+
         boton.disabled = false;
         boton.textContent = "Guardar";
     }
 }
+
+async function obtenerMensajeCambioRol(
+    response
+) {
+
+    let respuesta = null;
+
+    try {
+
+        respuesta =
+            await response.json();
+
+    } catch (error) {
+
+        respuesta = null;
+    }
+
+    /*
+     * Primero mostramos el mensaje real
+     * enviado por Spring Boot.
+     */
+    if (respuesta?.detail) {
+        return respuesta.detail;
+    }
+
+    if (respuesta?.message) {
+        return respuesta.message;
+    }
+
+    if (response.status === 409) {
+
+        return "No puedes retirar tu propio rol de administrador.";
+    }
+
+    if (response.status === 404) {
+
+        return "El usuario solicitado no existe.";
+    }
+
+    if (response.status === 400) {
+
+        return "El rol seleccionado no es válido.";
+    }
+
+    if (response.status === 401) {
+
+        return "Tu sesión venció. Inicia sesión nuevamente.";
+    }
+
+    if (response.status === 403) {
+
+        return "La solicitud fue rechazada. Verifica el token de seguridad y los permisos.";
+    }
+
+    return `No se pudo actualizar el rol. Código HTTP: ${response.status}`;
+}
+
 async function cambiarEstadoUsuario(
     idUsuario,
     boton
@@ -332,16 +463,32 @@ async function cambiarEstadoUsuario(
             : "Habilitando...";
 
     try {
+        const csrfActual =
+                await obtenerCsrfActual();
+
         const response = await fetch(
             `/api/admin/usuarios/${idUsuario}/estado`,
             {
                 method: "PATCH",
+
+                credentials: "same-origin",
+
+                cache: "no-store",
+
                 headers: {
-                    "Content-Type": "application/json",
-                    [csrfData.headerName]: csrfData.token
+                    "Content-Type":
+                        "application/json",
+
+                    "Accept":
+                        "application/json",
+
+                    [csrfActual.headerName]:
+                        csrfActual.token
                 },
+
                 body: JSON.stringify({
-                    estado: nuevoEstado
+                    estado:
+                        nuevoEstado
                 })
             }
         );

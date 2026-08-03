@@ -4,7 +4,7 @@ import com.infinityfutbol.dto.response.MatriculadoDetalleResponse;
 import com.infinityfutbol.dto.response.ReporteMatriculadosResponse;
 import com.infinityfutbol.entity.Alumno;
 import com.infinityfutbol.entity.Usuario;
-import com.infinityfutbol.entity.enums.EstadoAlumno;
+import com.infinityfutbol.entity.enums.EstadoUsuario;
 import com.infinityfutbol.repository.AlumnoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class ReporteMatriculadosService {
             LocalDate fechaInicio,
             LocalDate fechaFin,
             String texto,
-            EstadoAlumno estado
+            EstadoUsuario estado
     ) {
         validarFechas(
                 fechaInicio,
@@ -73,19 +73,22 @@ public class ReporteMatriculadosService {
         long activos =
                 alumnos.stream()
                         .filter(alumno ->
-                                alumno.getEstado()
-                                        == EstadoAlumno.ACTIVO
+                                alumno
+                                        .getUsuario()
+                                        .getEstado()
+                                        == EstadoUsuario.ACTIVO
                         )
                         .count();
 
         long inactivos =
                 alumnos.stream()
                         .filter(alumno ->
-                                alumno.getEstado()
-                                        == EstadoAlumno.INACTIVO
+                                alumno
+                                        .getUsuario()
+                                        .getEstado()
+                                        == EstadoUsuario.INACTIVO
                         )
                         .count();
-
         return new ReporteMatriculadosResponse(
                 fechaInicio,
                 fechaFin,

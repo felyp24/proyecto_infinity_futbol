@@ -21,11 +21,15 @@ async function iniciarPagina() {
     configurarFechaMaxima();
 
     try {
-        csrfData = await obtenerCsrf();
         await cargarAlumno();
 
-        formularioAlumno.classList.remove("oculto");
-        mensajeEstado.classList.add("oculto");
+        formularioAlumno.classList.remove(
+            "oculto"
+        );
+
+        mensajeEstado.classList.add(
+            "oculto"
+        );
 
     } catch (error) {
         console.error(error);
@@ -43,7 +47,19 @@ formularioAlumno.addEventListener(
 );
 
 async function obtenerCsrf() {
-    const response = await fetch("/api/csrf");
+
+    const response = await fetch(
+        "/api/csrf",
+        {
+            method: "GET",
+            credentials: "same-origin",
+            cache: "no-store",
+
+            headers: {
+                "Accept": "application/json"
+            }
+        }
+    );
 
     if (!response.ok) {
         throw new Error(
@@ -89,7 +105,9 @@ async function cargarAlumno() {
         alumno.correo ?? "";
 }
 
-async function actualizarAlumno(event) {
+async function actualizarAlumno(
+    event
+) {
     event.preventDefault();
 
     ocultarMensaje();
@@ -99,43 +117,87 @@ async function actualizarAlumno(event) {
 
     const request = {
         nombres:
-            document.getElementById("nombres").value.trim(),
+            document
+                .getElementById("nombres")
+                .value
+                .trim(),
 
         apellidos:
-            document.getElementById("apellidos").value.trim(),
+            document
+                .getElementById("apellidos")
+                .value
+                .trim(),
 
         tipoDocumento:
-            document.getElementById("tipoDocumento").value,
+            document
+                .getElementById("tipoDocumento")
+                .value,
 
         numeroDocumento:
-            document.getElementById("numeroDocumento").value.trim(),
+            document
+                .getElementById("numeroDocumento")
+                .value
+                .trim(),
 
         fechaNacimiento:
-            obtenerValorOpcional("fechaNacimiento"),
+            obtenerValorOpcional(
+                "fechaNacimiento"
+            ),
 
         telefono:
-            obtenerValorOpcional("telefono"),
+            obtenerValorOpcional(
+                "telefono"
+            ),
 
         correo:
-            document.getElementById("correo").value.trim()
+            document
+                .getElementById("correo")
+                .value
+                .trim()
     };
 
     try {
+
+        /*
+         * Se obtiene un token actualizado
+         * inmediatamente antes del PUT.
+         */
+        const csrfActual =
+            await obtenerCsrf();
+
         const response = await fetch(
-            `/api/admin/alumnos/${encodeURIComponent(idAlumno)}`,
+            `/api/admin/alumnos/${
+                encodeURIComponent(idAlumno)
+            }`,
             {
                 method: "PUT",
+
+                credentials: "same-origin",
+
+                cache: "no-store",
+
                 headers: {
-                    "Content-Type": "application/json",
-                    [csrfData.headerName]: csrfData.token
+                    "Content-Type":
+                        "application/json",
+
+                    "Accept":
+                        "application/json",
+
+                    [csrfActual.headerName]:
+                        csrfActual.token
                 },
-                body: JSON.stringify(request)
+
+                body: JSON.stringify(
+                    request
+                )
             }
         );
 
         if (!response.ok) {
             throw new Error(
-                await obtenerMensajeError(response)
+                await obtenerMensajeError(
+                    response
+                )
             );
         }
 
@@ -143,11 +205,16 @@ async function actualizarAlumno(event) {
             await response.json();
 
         mostrarExito(
-            `La información de ${alumnoActualizado.nombres} fue actualizada correctamente.`
+            `La información de ${
+                alumnoActualizado.nombres
+            } fue actualizada correctamente.`
         );
 
     } catch (error) {
-        console.error(error);
+        console.error(
+            "Error al actualizar alumno:",
+            error
+        );
 
         mostrarError(
             error.message
@@ -156,7 +223,8 @@ async function actualizarAlumno(event) {
 
     } finally {
         botonGuardar.disabled = false;
-        botonGuardar.textContent = "Guardar cambios";
+        botonGuardar.textContent =
+            "Guardar cambios";
     }
 }
 
@@ -195,35 +263,54 @@ function convertirFechaInput(fecha) {
     return `${anio}-${mes}-${dia}`;
 }
 
-async function obtenerMensajeError(response) {
+async function obtenerMensajeError(
+    response
+) {
     let respuesta = null;
 
     try {
-        respuesta = await response.json();
-    } catch {
+        respuesta =
+            await response.json();
+
+    } catch (error) {
         respuesta = null;
     }
 
+    /*
+     * Mostrar primero el mensaje real
+     * generado por Spring Boot.
+     */
+    if (respuesta?.detail) {
+        return respuesta.detail;
+    }
+
+    if (respuesta?.message) {
+        return respuesta.message;
+    }
+
     if (response.status === 404) {
-        return respuesta?.detail
-            ?? "No se encontró el alumno.";
+        return "No se encontró el alumno.";
     }
 
     if (response.status === 409) {
-        return respuesta?.detail
-            ?? "El documento o correo ya está registrado.";
+        return "El documento o correo ya está registrado.";
     }
 
     if (response.status === 400) {
-        return obtenerMensajeValidacion(respuesta);
+        return obtenerMensajeValidacion(
+            respuesta
+        );
+    }
+
+    if (response.status === 401) {
+        return "Tu sesión venció. Inicia sesión nuevamente.";
     }
 
     if (response.status === 403) {
-        return "No tienes permiso para editar alumnos.";
+        return "La solicitud fue rechazada por el token de seguridad.";
     }
 
-    return respuesta?.detail
-        ?? "Ocurrió un error al procesar la solicitud.";
+    return `No se pudo actualizar el alumno. Código HTTP: ${response.status}`;
 }
 
 function obtenerMensajeValidacion(respuesta) {

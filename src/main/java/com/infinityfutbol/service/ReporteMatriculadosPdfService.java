@@ -2,7 +2,7 @@ package com.infinityfutbol.service;
 
 import com.infinityfutbol.dto.response.MatriculadoDetalleResponse;
 import com.infinityfutbol.dto.response.ReporteMatriculadosResponse;
-import com.infinityfutbol.entity.enums.EstadoAlumno;
+import com.infinityfutbol.entity.enums.EstadoUsuario;
 import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
 import org.openpdf.text.Element;
@@ -51,7 +51,7 @@ public class ReporteMatriculadosPdfService {
             LocalDate fechaInicio,
             LocalDate fechaFin,
             String texto,
-            EstadoAlumno estado
+            EstadoUsuario estado
     ) {
         ReporteMatriculadosResponse reporte =
                 reporteMatriculadosService
@@ -497,11 +497,11 @@ public class ReporteMatriculadosPdfService {
 
                 agregarCeldaCentrada(
                         tabla,
-                        matriculado.estadoAlumno() == null
+                        matriculado.estadoUsuario() == null
                                 ? "-"
                                 : formatearEstado(
                                 matriculado
-                                        .estadoAlumno()
+                                        .estadoUsuario()
                                         .name()
                         )
                 );

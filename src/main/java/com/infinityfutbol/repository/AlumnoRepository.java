@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.infinityfutbol.entity.enums.EstadoAlumno;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.infinityfutbol.entity.enums.EstadoUsuario;
 
 
 
@@ -64,7 +65,7 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
 
       AND (
             :estado IS NULL
-            OR a.estado = :estado
+            OR a.usuario.estado = :estado
       )
 
       AND (
@@ -111,6 +112,6 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
             String texto,
 
             @Param("estado")
-            EstadoAlumno estado
+            EstadoUsuario estado
     );
 }

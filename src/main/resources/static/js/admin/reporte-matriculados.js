@@ -360,8 +360,8 @@ function mostrarDetalle(
                         </span>
 
                         <span class="dato-secundario">
-                            ${formatearEstadoUsuario(
-                                matriculado.estadoUsuario
+                            ${escaparHtml(
+                                matriculado.correo
                             )}
                         </span>
 
@@ -372,11 +372,11 @@ function mostrarDetalle(
                         <span class="
                             estado
                             ${obtenerClaseEstado(
-                                matriculado.estadoAlumno
+                                matriculado.estadoUsuario
                             )}
                         ">
-                            ${formatearEstadoAlumno(
-                                matriculado.estadoAlumno
+                            ${formatearEstadoUsuario(
+                                matriculado.estadoUsuario
                             )}
                         </span>
 
@@ -426,10 +426,10 @@ function formatearEstadoUsuario(
 
     const estados = {
         ACTIVO:
-            "Usuario activo",
+            "Activo",
 
         INACTIVO:
-            "Usuario inactivo"
+            "Inactivo"
     };
 
     return estados[estado]

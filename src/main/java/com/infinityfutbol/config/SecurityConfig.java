@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableMethodSecurity
@@ -73,6 +74,12 @@ public class SecurityConfig {
                         customUserDetailsService
                 );
 
+        CookieCsrfTokenRepository csrfTokenRepository =
+                CookieCsrfTokenRepository
+                        .withHttpOnlyFalse();
+
+        csrfTokenRepository.setCookiePath("/");
+
         /*
          * Usamos un matcher explícito basado en la URI.
          * De esta manera /login siempre será reconocida
@@ -91,6 +98,12 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
+                        )
+                )
+
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(
+                                csrfTokenRepository
                         )
                 )
 

@@ -1,7 +1,7 @@
 package com.infinityfutbol.controller.api;
 
 import com.infinityfutbol.dto.response.ReporteMatriculadosResponse;
-import com.infinityfutbol.entity.enums.EstadoAlumno;
+import com.infinityfutbol.entity.enums.EstadoUsuario;
 import com.infinityfutbol.service.ReporteMatriculadosPdfService;
 import com.infinityfutbol.service.ReporteMatriculadosService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -68,7 +68,7 @@ public class ReporteMatriculadosAdminController {
             @RequestParam(
                     required = false
             )
-            EstadoAlumno estado
+            EstadoUsuario estado
     ) {
         return reporteMatriculadosService
                 .generarReporte(
@@ -106,7 +106,7 @@ public class ReporteMatriculadosAdminController {
             @RequestParam(
                     required = false
             )
-            EstadoAlumno estado
+            EstadoUsuario estado
     ) {
         byte[] pdf =
                 reporteMatriculadosPdfService
