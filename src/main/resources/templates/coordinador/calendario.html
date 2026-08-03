@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Calendario de clases | Infinity Fútbol
+    </title>
+
+    <!-- Bootstrap -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <!-- Barra compartida -->
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+
+            color: #26352f;
+            background-color: #f4f6f5;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .contenedor-calendario {
+            width: 94%;
+            max-width: 1300px;
+
+            margin: 36px auto;
+        }
+
+        .encabezado-calendario {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 24px;
+        }
+
+        .encabezado-calendario h1 {
+            margin: 0 0 7px;
+
+            color: #143d2b;
+
+            font-size: 2rem;
+        }
+
+        .encabezado-calendario p {
+            margin: 0;
+
+            color: #68756f;
+        }
+
+        .panel-calendario {
+            padding: 24px;
+
+            background-color: #ffffff;
+
+            border: 1px solid #dfe5e2;
+            border-radius: 12px;
+
+            box-shadow:
+                    0 5px 18px
+                    rgba(0, 0, 0, 0.05);
+        }
+
+        .leyenda-calendario {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 18px;
+
+            margin-bottom: 20px;
+        }
+
+        .elemento-leyenda {
+            display: flex;
+            align-items: center;
+
+            gap: 7px;
+
+            color: #5f6c66;
+
+            font-size: 0.88rem;
+        }
+
+        .color-leyenda {
+            display: inline-block;
+
+            width: 12px;
+            height: 12px;
+
+            border-radius: 50%;
+        }
+
+        .color-disponible {
+            background-color: #198754;
+        }
+
+        .color-limitado {
+            background-color: #d39e00;
+        }
+
+        .color-sin-cupos {
+            background-color: #dc3545;
+        }
+
+        .mensaje-calendario {
+            margin-bottom: 20px;
+        }
+
+        .fc .fc-toolbar-title {
+            color: #143d2b;
+
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .fc .fc-button-primary {
+            background-color: #198754;
+            border-color: #198754;
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: #157347;
+            border-color: #146c43;
+        }
+
+        .fc .fc-button-primary:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+        .fc .fc-daygrid-event {
+            padding: 3px 5px;
+
+            border: none;
+
+            cursor: pointer;
+        }
+
+        .evento-disponible {
+            background-color: #198754 !important;
+            border-color: #198754 !important;
+
+            color: #ffffff !important;
+        }
+
+        .evento-limitado {
+            background-color: #d39e00 !important;
+            border-color: #d39e00 !important;
+
+            color: #ffffff !important;
+        }
+
+        .evento-sin-cupos {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+
+            color: #ffffff !important;
+        }
+
+        .detalle-clase {
+            display: grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            minmax(0, 1fr)
+                    );
+
+            gap: 14px;
+        }
+
+        .detalle-item {
+            padding: 12px;
+
+            background-color: #f5f7f6;
+
+            border-radius: 7px;
+        }
+
+        .detalle-etiqueta {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: #69756f;
+
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .detalle-valor {
+            color: #26352f;
+
+            font-weight: 600;
+        }
+
+        .descripcion-clase {
+            margin-bottom: 18px;
+
+            color: #5e6a65;
+
+            line-height: 1.5;
+        }
+
+        @media (max-width: 767px) {
+
+            .contenedor-calendario {
+                width: 94%;
+
+                margin: 24px auto;
+            }
+
+            .encabezado-calendario {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .encabezado-calendario a {
+                width: 100%;
+            }
+
+            .panel-calendario {
+                padding: 15px;
+            }
+
+            .detalle-clase {
+                grid-template-columns: 1fr;
+            }
+
+            .fc .fc-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+
+                gap: 10px;
+            }
+
+            .fc .fc-toolbar-chunk {
+                text-align: center;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- Barra de navegación por roles -->
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="contenedor-calendario">
+
+    <header class="encabezado-calendario">
+
+        <div>
+
+            <h1>
+                Calendario de clases
+            </h1>
+
+            <p>
+                Consulta la programación, entrenador,
+                sede, cancha y disponibilidad de cada clase.
+            </p>
+
+        </div>
+
+        <a
+                th:href="@{/coordinador/clases}"
+                class="btn btn-success"
+        >
+            Gestionar clases
+        </a>
+
+    </header>
+
+    <section class="panel-calendario">
+
+        <div class="leyenda-calendario">
+
+            <span class="elemento-leyenda">
+
+                <span
+                        class="color-leyenda
+                               color-disponible"
+                ></span>
+
+                Cupos disponibles
+
+            </span>
+
+            <span class="elemento-leyenda">
+
+                <span
+                        class="color-leyenda
+                               color-limitado"
+                ></span>
+
+                Pocos cupos
+
+            </span>
+
+            <span class="elemento-leyenda">
+
+                <span
+                        class="color-leyenda
+                               color-sin-cupos"
+                ></span>
+
+                Sin cupos
+
+            </span>
+
+        </div>
+
+        <div
+                id="mensajeCalendario"
+                class="alert alert-danger mensaje-calendario d-none"
+                role="alert"
+        ></div>
+
+        <div id="calendarioClases"></div>
+
+    </section>
+
+</main>
+
+<!-- Modal de detalles -->
+
+<div
+        class="modal fade"
+        id="modalDetalleClase"
+        tabindex="-1"
+        aria-labelledby="tituloDetalleClase"
+        aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+
+                    <span
+                            id="estadoDetalleClase"
+                            class="badge text-bg-success mb-2"
+                    >
+                        Programada
+                    </span>
+
+                    <h2
+                            id="tituloDetalleClase"
+                            class="modal-title fs-5"
+                    >
+                        Detalles de la clase
+                    </h2>
+
+                </div>
+
+                <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p
+                        id="descripcionDetalleClase"
+                        class="descripcion-clase"
+                >
+                    Sin descripción.
+                </p>
+
+                <div class="detalle-clase">
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Fecha
+                        </span>
+
+                        <span
+                                id="fechaDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Horario
+                        </span>
+
+                        <span
+                                id="horarioDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Entrenador
+                        </span>
+
+                        <span
+                                id="entrenadorDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Sede
+                        </span>
+
+                        <span
+                                id="sedeDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Cancha
+                        </span>
+
+                        <span
+                                id="canchaDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                    <div class="detalle-item">
+
+                        <span class="detalle-etiqueta">
+                            Cupos
+                        </span>
+
+                        <span
+                                id="cuposDetalleClase"
+                                class="detalle-valor"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                >
+                    Cerrar
+                </button>
+
+                <a
+                        th:href="@{/coordinador/clases}"
+                        class="btn btn-success"
+                >
+                    Ir a gestión de clases
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FullCalendar -->
+<script
+        src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.21/index.global.min.js"
+></script>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.21/locales/es.global.min.js"
+></script>
+
+<!-- Bootstrap -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<!-- Navegación -->
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<!-- Calendario administrativo -->
+<script
+        th:src="@{/js/coordinador-calendario.js}"
+></script>
+
+<!-- Cierre de sesión -->
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>
