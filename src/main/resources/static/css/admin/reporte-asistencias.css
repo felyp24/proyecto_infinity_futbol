@@ -1,0 +1,284 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+
+    color: #26352f;
+    background-color: #f4f7f5;
+
+    font-family: Arial, sans-serif;
+}
+
+.reporte-contenedor {
+    width: 95%;
+    max-width: 1450px;
+
+    margin: 35px auto;
+}
+
+.reporte-encabezado {
+    margin-bottom: 24px;
+}
+
+.reporte-encabezado h1 {
+    margin: 0 0 7px;
+
+    color: #143d2b;
+
+    font-size: 2rem;
+}
+
+.reporte-encabezado p {
+    margin: 0;
+
+    color: #68756f;
+}
+
+.reporte-panel {
+    padding: 24px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dfe6e2;
+    border-radius: 12px;
+
+    box-shadow:
+            0 5px 18px
+            rgba(0, 0, 0, 0.05);
+}
+
+.reporte-filtros {
+    display: grid;
+
+    grid-template-columns:
+            minmax(160px, 0.8fr)
+            minmax(160px, 0.8fr)
+            minmax(260px, 1.5fr)
+            auto
+            auto;
+
+    align-items: end;
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+.reporte-campo {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.reporte-campo label {
+    color: #34423c;
+
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.reporte-campo input {
+    min-height: 42px;
+
+    padding: 9px 11px;
+
+    border: 1px solid #bdc7c2;
+    border-radius: 6px;
+}
+
+.reporte-campo input:focus {
+    outline: none;
+
+    border-color: #198754;
+
+    box-shadow:
+            0 0 0 3px
+            rgba(25, 135, 84, 0.12);
+}
+
+.oculto {
+    display: none !important;
+}
+
+.reporte-resumen {
+    display: grid;
+
+    grid-template-columns:
+            repeat(
+                    auto-fit,
+                    minmax(155px, 1fr)
+            );
+
+    gap: 14px;
+
+    margin-bottom: 27px;
+}
+
+.reporte-tarjeta {
+    padding: 18px;
+
+    background-color: #f7faf8;
+
+    border-left: 4px solid #198754;
+    border-radius: 8px;
+}
+
+.reporte-tarjeta span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #68756f;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.reporte-tarjeta strong {
+    color: #143d2b;
+
+    font-size: 1.5rem;
+}
+
+.reporte-titulo-detalle {
+    margin: 0 0 14px;
+
+    color: #143d2b;
+
+    font-size: 1.25rem;
+}
+
+.reporte-tabla-contenedor {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.reporte-tabla {
+    width: 100%;
+    min-width: 1250px;
+
+    border-collapse: collapse;
+}
+
+.reporte-tabla th,
+.reporte-tabla td {
+    padding: 12px;
+
+    text-align: left;
+    vertical-align: middle;
+
+    border-bottom: 1px solid #e1e7e4;
+
+    font-size: 0.85rem;
+}
+
+.reporte-tabla th {
+    color: #34423c;
+    background-color: #f5f8f6;
+}
+
+.reporte-tabla tbody tr:hover {
+    background-color: #f8fbf9;
+}
+
+.dato-principal {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #25352f;
+
+    font-weight: 700;
+}
+
+.dato-secundario {
+    display: block;
+
+    color: #6c757d;
+
+    font-size: 0.75rem;
+}
+
+.estado-asistencia {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 15px;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.estado-presente {
+    color: #0f5132;
+    background-color: #d1e7dd;
+}
+
+.estado-ausente {
+    color: #842029;
+    background-color: #f8d7da;
+}
+
+.estado-tardanza {
+    color: #664d03;
+    background-color: #fff3cd;
+}
+
+.estado-justificada {
+    color: #084298;
+    background-color: #cfe2ff;
+}
+
+.sin-resultados {
+    padding: 28px !important;
+
+    color: #6c757d;
+
+    text-align: center !important;
+}
+
+@media (max-width: 1100px) {
+
+    .reporte-filtros {
+        grid-template-columns:
+                repeat(
+                        2,
+                        minmax(0, 1fr)
+                );
+    }
+
+    .reporte-campo-busqueda {
+        grid-column:
+                1 / -1;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .reporte-contenedor {
+        width: 94%;
+
+        margin: 24px auto;
+    }
+
+    .reporte-panel {
+        padding: 16px;
+    }
+
+    .reporte-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .reporte-campo-busqueda {
+        grid-column: auto;
+    }
+
+    .reporte-filtros button {
+        width: 100%;
+    }
+}

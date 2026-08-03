@@ -165,4 +165,39 @@ public interface ClaseRepository
             @Param("estado")
             EstadoClase estado
     );
+
+    @EntityGraph(attributePaths = {
+            "cancha",
+            "cancha.sede",
+            "entrenador"
+    })
+    @Query("""
+    SELECT c
+    FROM Clase c
+    WHERE c.fechaClase = :fechaClase
+      AND c.estado <> :estadoExcluido
+    ORDER BY c.horaInicio ASC
+    """)
+    List<Clase> listarClasesParaAsistencia(
+            @Param("fechaClase")
+            LocalDate fechaClase,
+
+            @Param("estadoExcluido")
+            EstadoClase estadoExcluido
+    );
+
+    @EntityGraph(attributePaths = {
+            "cancha",
+            "cancha.sede",
+            "entrenador"
+    })
+    @Query("""
+    SELECT c
+    FROM Clase c
+    WHERE c.idClase = :idClase
+    """)
+    Optional<Clase> buscarClaseParaAsistencia(
+            @Param("idClase")
+            String idClase
+    );
 }

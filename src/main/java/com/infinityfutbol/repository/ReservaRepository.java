@@ -177,4 +177,20 @@ public interface ReservaRepository
 
             Pageable pageable
     );
+
+    @EntityGraph(attributePaths = {
+            "alumno",
+            "alumno.usuario",
+            "clase"
+    })
+    List<Reserva>
+    findByClase_IdClaseAndEstadoOrderByAlumno_ApellidosAscAlumno_NombresAsc(
+            String idClase,
+            EstadoReserva estado
+    );
+
+    long countByClase_IdClaseAndEstado(
+            String idClase,
+            EstadoReserva estado
+    );
 }
