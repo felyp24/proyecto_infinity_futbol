@@ -467,3 +467,71 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.cupon-cliente {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 18px;
+
+    padding: 20px;
+
+    background-color: #ffffff;
+
+    border: 1px solid #dfe6e2;
+    border-left: 4px solid #198754;
+    border-radius: 10px;
+}
+
+.cupon-cliente-formulario {
+    display: flex;
+
+    width: 100%;
+    max-width: 470px;
+
+    gap: 10px;
+}
+
+.cupon-cliente-formulario input {
+    text-transform: uppercase;
+}
+
+.resultado-cupon-valido {
+    display: block;
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    color: #0f5132;
+    background-color: #d1e7dd;
+
+    border-radius: 7px;
+
+    font-weight: 600;
+}
+
+.resultado-cupon-error {
+    display: block;
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    color: #842029;
+    background-color: #f8d7da;
+
+    border-radius: 7px;
+
+    font-weight: 600;
+}
+
+@media (max-width: 650px) {
+
+    .cupon-cliente-formulario {
+        max-width: none;
+        flex-direction: column;
+    }
+}

@@ -119,6 +119,49 @@
             role="alert"
     ></div>
 
+    <section class="cupon-cliente mb-4">
+
+        <div>
+
+            <h2 class="h5 titulo-seccion mb-1">
+                Cupón de descuento
+            </h2>
+
+            <p class="text-muted mb-0">
+                Ingresa un código promocional antes
+                de seleccionar el paquete.
+            </p>
+
+        </div>
+
+        <div class="cupon-cliente-formulario">
+
+            <input
+                    id="codigoCupon"
+                    type="text"
+                    maxlength="50"
+                    class="form-control"
+                    autocomplete="off"
+                    placeholder="Ejemplo: INF-VERANO"
+            >
+
+            <button
+                    id="botonValidarCupon"
+                    type="button"
+                    class="btn btn-outline-success"
+            >
+                Validar cupón
+            </button>
+
+        </div>
+
+        <div
+                id="resultadoCupon"
+                class="mt-2 d-none"
+        ></div>
+
+    </section>
+
     <section class="mb-4">
 
         <div class="mb-3">

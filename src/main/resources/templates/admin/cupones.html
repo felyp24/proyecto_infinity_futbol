@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Cupones de descuento | Infinity Fútbol
+    </title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/admin/cupones.css}"
+            rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<div
+        th:replace="~{fragments/navbar :: navbar}"
+></div>
+
+<main class="cupon-contenedor">
+
+    <header class="cupon-encabezado">
+
+        <h1>
+            Cupones de descuento
+        </h1>
+
+        <p>
+            Genera códigos promocionales para las recargas
+            de créditos.
+        </p>
+
+    </header>
+
+    <section class="cupon-panel">
+
+        <h2>
+            Crear cupón
+        </h2>
+
+        <form
+                id="formularioCupon"
+                class="cupon-formulario"
+        >
+
+            <div class="cupon-campo cupon-codigo">
+
+                <label for="codigo">
+                    Código
+                </label>
+
+                <div class="input-group">
+
+                    <input
+                            id="codigo"
+                            type="text"
+                            maxlength="50"
+                            autocomplete="off"
+                            placeholder="Vacío para generar automáticamente"
+                    >
+
+                    <button
+                            id="botonGenerarCodigo"
+                            type="button"
+                            class="btn btn-outline-secondary"
+                    >
+                        Generar
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="cupon-campo">
+
+                <label for="porcentajeDescuento">
+                    Descuento
+                </label>
+
+                <div class="input-group">
+
+                    <input
+                            id="porcentajeDescuento"
+                            type="number"
+                            min="1"
+                            max="90"
+                            step="0.01"
+                            required
+                    >
+
+                    <span class="input-group-text">
+                        %
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="cupon-campo">
+
+                <label for="fechaInicio">
+                    Fecha de inicio
+                </label>
+
+                <input
+                        id="fechaInicio"
+                        type="date"
+                        required
+                >
+
+            </div>
+
+            <div class="cupon-campo">
+
+                <label for="fechaExpiracion">
+                    Fecha de expiración
+                </label>
+
+                <input
+                        id="fechaExpiracion"
+                        type="date"
+                        required
+                >
+
+            </div>
+
+            <button
+                    id="botonCrearCupon"
+                    type="submit"
+                    class="btn btn-success"
+            >
+                Crear cupón
+            </button>
+
+        </form>
+
+        <div
+                id="mensajePagina"
+                class="alert d-none mt-3"
+                role="alert"
+        ></div>
+
+    </section>
+
+    <section class="cupon-panel mt-4">
+
+        <div class="cupon-listado-encabezado">
+
+            <div>
+
+                <h2>
+                    Cupones generados
+                </h2>
+
+                <p>
+                    Activa o desactiva los códigos disponibles.
+                </p>
+
+            </div>
+
+            <form
+                    id="formularioBusqueda"
+                    class="d-flex gap-2"
+            >
+
+                <input
+                        id="textoBusqueda"
+                        type="search"
+                        class="form-control"
+                        placeholder="Buscar código"
+                >
+
+                <button
+                        type="submit"
+                        class="btn btn-outline-success"
+                >
+                    Buscar
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                <tr>
+                    <th>Código</th>
+                    <th>Descuento</th>
+                    <th>Inicio</th>
+                    <th>Expiración</th>
+                    <th>Situación</th>
+                    <th>Estado</th>
+                    <th class="text-end">Acción</th>
+                </tr>
+
+                </thead>
+
+                <tbody id="tablaCupones">
+
+                <tr>
+                    <td
+                            colspan="7"
+                            class="text-center text-muted py-4"
+                    >
+                        Cargando cupones...
+                    </td>
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script
+        th:src="@{/js/componentes/navbar.js}"
+></script>
+
+<script
+        th:src="@{/js/admin/cupones.js}"
+></script>
+
+<script
+        th:src="@{/js/auth/logout.js}"
+></script>
+
+</body>
+</html>

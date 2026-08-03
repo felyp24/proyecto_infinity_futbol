@@ -77,7 +77,8 @@ public class MercadoPagoCheckoutService {
     @Transactional
     public PreferenciaPagoResponse crearPreferencia(
             String idUsuario,
-            String idPaqueteCredito
+            String idPaqueteCredito,
+            String codigoCupon
     ) {
         validarAccessToken();
 
@@ -91,14 +92,15 @@ public class MercadoPagoCheckoutService {
         Pago pago =
                 creditoService.crearPagoPendiente(
                         idUsuario,
-                        idPaqueteCredito
+                        idPaqueteCredito,
+                        codigoCupon
                 );
 
         PaqueteCredito paquete =
                 pago.getPaqueteCredito();
 
         PreferenceItemRequest item =
-                construirItem(paquete);
+                construirItem(pago);
 
         PreferencePayerRequest comprador =
                 construirComprador(pago);
@@ -217,9 +219,25 @@ public class MercadoPagoCheckoutService {
     }
 
     private PreferenceItemRequest construirItem(
-            PaqueteCredito paquete
+            Pago pago
     ) {
-        return PreferenceItemRequest.builder()
+        PaqueteCredito paquete =
+                pago.getPaqueteCredito();
+
+        String descripcion =
+                "Recarga de "
+                        + paquete.getCantidadCreditos()
+                        + " créditos en Infinity Fútbol";
+
+        if (pago.getCupon() != null) {
+            descripcion +=
+                    " | Cupón "
+                            + pago.getCupon()
+                            .getCodigo();
+        }
+
+        return PreferenceItemRequest
+                .builder()
                 .id(
                         paquete.getIdPaqueteCredito()
                 )
@@ -227,14 +245,17 @@ public class MercadoPagoCheckoutService {
                         paquete.getNombre()
                 )
                 .description(
-                        "Recarga de "
-                                + paquete.getCantidadCreditos()
-                                + " créditos en Infinity Fútbol"
+                        descripcion
                 )
                 .currencyId(MONEDA)
                 .quantity(1)
+
+                /*
+                 * Mercado Pago debe recibir el monto
+                 * final después del descuento.
+                 */
                 .unitPrice(
-                        paquete.getPrecio()
+                        pago.getMontoTotal()
                 )
                 .build();
     }

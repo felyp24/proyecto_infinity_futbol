@@ -99,7 +99,10 @@ public class CreditoClienteController {
                                 .getIdUsuario(),
 
                         request
-                                .idPaqueteCredito()
+                                .idPaqueteCredito(),
+
+                        request
+                                .codigoCupon()
                 );
     }
 

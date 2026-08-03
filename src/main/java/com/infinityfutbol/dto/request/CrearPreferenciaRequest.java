@@ -14,7 +14,14 @@ public record CrearPreferenciaRequest(
                 message =
                         "El identificador del paquete no es válido"
         )
-        String idPaqueteCredito
+        String idPaqueteCredito,
+
+        @Size(
+                max = 50,
+                message =
+                        "El código del cupón no puede superar los 50 caracteres"
+        )
+        String codigoCupon
 
 ) {
 }

@@ -72,16 +72,14 @@ public class Pago {
     )
     private PaqueteCredito paqueteCredito;
 
-    /*
-     * Por ahora se guarda solamente el ID.
-     * La entidad CuponDescuento se creará cuando
-     * desarrollemos el módulo de cupones.
-     */
-    @Column(
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
             name = "id_cupon",
-            length = 20
+            foreignKey = @ForeignKey(
+                    name = "fk_pago_cupon"
+            )
     )
-    private String idCupon;
+    private CuponDescuento cupon;
 
     @Column(
             name = "fecha_pago",
@@ -247,14 +245,16 @@ public class Pago {
                 paqueteCredito;
     }
 
-    public String getIdCupon() {
-        return idCupon;
+
+
+    public CuponDescuento getCupon() {
+        return cupon;
     }
 
-    public void setIdCupon(
-            String idCupon
+    public void setCupon(
+            CuponDescuento cupon
     ) {
-        this.idCupon = idCupon;
+        this.cupon = cupon;
     }
 
     public LocalDateTime getFechaPago() {

@@ -47,6 +47,9 @@ public class CreditoService {
     private final MovimientoCreditoRepository
             movimientoCreditoRepository;
 
+    private final CuponDescuentoService
+            cuponDescuentoService;
+
     public CreditoService(
             PaqueteCreditoRepository
                     paqueteCreditoRepository,
@@ -56,7 +59,9 @@ public class CreditoService {
             PagoRepository pagoRepository,
 
             MovimientoCreditoRepository
-                    movimientoCreditoRepository
+                    movimientoCreditoRepository,
+            CuponDescuentoService
+                    cuponDescuentoService
     ) {
         this.paqueteCreditoRepository =
                 paqueteCreditoRepository;
@@ -69,6 +74,9 @@ public class CreditoService {
 
         this.movimientoCreditoRepository =
                 movimientoCreditoRepository;
+
+        this.cuponDescuentoService =
+                cuponDescuentoService;
     }
 
     @Transactional(readOnly = true)
@@ -91,7 +99,8 @@ public class CreditoService {
     @Transactional
     public Pago crearPagoPendiente(
             String idUsuario,
-            String idPaqueteCredito
+            String idPaqueteCredito,
+            String codigoCupon
     ) {
         validarIdentificadores(
                 idUsuario,
@@ -108,6 +117,13 @@ public class CreditoService {
 
         validarPrecioPaquete(paquete);
 
+        CuponCalculo calculo =
+                cuponDescuentoService
+                        .calcularDescuento(
+                                codigoCupon,
+                                paquete.getPrecio()
+                        );
+
         Pago pago = new Pago();
 
         pago.setIdPago(
@@ -120,18 +136,20 @@ public class CreditoService {
                 paquete
         );
 
-        pago.setIdCupon(null);
+        pago.setCupon(
+                calculo.cupon()
+        );
 
         pago.setMontoBruto(
-                paquete.getPrecio()
+                calculo.montoBruto()
         );
 
         pago.setMontoDescuento(
-                BigDecimal.ZERO
+                calculo.montoDescuento()
         );
 
         pago.setMontoTotal(
-                paquete.getPrecio()
+                calculo.montoTotal()
         );
 
         pago.setMoneda(

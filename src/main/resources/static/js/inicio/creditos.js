@@ -31,6 +31,23 @@ const btnActualizarPagos =
 const CLAVE_PAGO_PENDIENTE =
     "infinityFutbolPagoPendiente";
 
+const codigoCupon =
+    document.getElementById(
+        "codigoCupon"
+    );
+
+const botonValidarCupon =
+    document.getElementById(
+        "botonValidarCupon"
+    );
+
+const resultadoCupon =
+    document.getElementById(
+        "resultadoCupon"
+    );
+
+let cuponValidado = null;
+
 let paquetesCargados = [];
 
 let modalBoleta;
@@ -72,6 +89,31 @@ async function iniciarPaginaCreditos() {
         cargarPaquetes(),
         cargarPagos()
     ]);
+
+    botonValidarCupon.addEventListener(
+        "click",
+        validarCuponIngresado
+    );
+
+    codigoCupon.addEventListener(
+        "input",
+        () => {
+
+            codigoCupon.value =
+                codigoCupon.value
+                    .toUpperCase()
+                    .replace(
+                        /[^A-Z0-9-]/g,
+                        ""
+                    );
+
+            cuponValidado = null;
+
+            resultadoCupon.classList.add(
+                "d-none"
+            );
+        }
+    );
 }
 
 /*
@@ -274,24 +316,109 @@ async function manejarClickPaquete(
         return;
     }
 
-    const confirmado = window.confirm(
-        `Vas a comprar ${paquete.cantidadCreditos} `
-        + `créditos por ${formatearMoneda(paquete.precio)}. `
-        + "¿Deseas continuar?"
-    );
+    try {
 
-    if (!confirmado) {
-        return;
+        const codigoIngresado =
+            codigoCupon.value.trim();
+
+        let informacionCupon = null;
+
+        /*
+         * Se vuelve a validar antes de comprar.
+         * No se confía solamente en la validación anterior.
+         */
+        if (codigoIngresado) {
+
+            informacionCupon =
+                await consultarCupon(
+                    codigoIngresado
+                );
+
+            cuponValidado =
+                informacionCupon;
+
+            mostrarResultadoCupon(
+                informacionCupon
+            );
+        }
+
+        const montoBruto =
+            Number(paquete.precio);
+
+        const porcentaje =
+            Number(
+                informacionCupon
+                    ?.porcentajeDescuento
+                ?? 0
+            );
+
+        const montoDescuento =
+            redondearMoneda(
+                montoBruto
+                * porcentaje
+                / 100
+            );
+
+        const montoTotal =
+            redondearMoneda(
+                montoBruto
+                - montoDescuento
+            );
+
+        let mensajeConfirmacion =
+            `Vas a comprar ${paquete.cantidadCreditos} `
+            + `créditos por ${formatearMoneda(montoTotal)}.`;
+
+        if (informacionCupon) {
+
+            mensajeConfirmacion =
+                `Precio original: ${
+                    formatearMoneda(montoBruto)
+                }\n`
+                + `Cupón: ${
+                    informacionCupon.codigo
+                } (${porcentaje}%)\n`
+                + `Descuento: ${
+                    formatearMoneda(montoDescuento)
+                }\n`
+                + `Total: ${
+                    formatearMoneda(montoTotal)
+                }`;
+        }
+
+        const confirmado =
+            window.confirm(
+                mensajeConfirmacion
+                + "\n\n¿Deseas continuar?"
+            );
+
+        if (!confirmado) {
+            return;
+        }
+
+        await crearPreferenciaPago(
+            idPaquete,
+            informacionCupon?.codigo
+                ?? null,
+            boton
+        );
+
+    } catch (error) {
+
+        mostrarResultadoCuponError(
+            error.message
+        );
+
+        mostrarMensaje(
+            error.message,
+            "danger"
+        );
     }
-
-    await crearPreferenciaPago(
-        idPaquete,
-        boton
-    );
 }
 
 async function crearPreferenciaPago(
     idPaquete,
+    codigoCuponAplicado,
     boton
 ) {
 
@@ -1253,4 +1380,125 @@ function formatearMetodoPago(
     return String(metodoPago)
         .replaceAll("_", " ")
         .toUpperCase();
+}
+
+async function validarCuponIngresado() {
+
+    const codigoIngresado =
+        codigoCupon.value.trim();
+
+    if (!codigoIngresado) {
+
+        mostrarResultadoCuponError(
+            "Debe ingresar un código de descuento."
+        );
+
+        return;
+    }
+
+    botonValidarCupon.disabled = true;
+    botonValidarCupon.textContent =
+        "Validando...";
+
+    try {
+
+        cuponValidado =
+            await consultarCupon(
+                codigoIngresado
+            );
+
+        mostrarResultadoCupon(
+            cuponValidado
+        );
+
+    } catch (error) {
+
+        cuponValidado = null;
+
+        mostrarResultadoCuponError(
+            error.message
+        );
+
+    } finally {
+
+        botonValidarCupon.disabled = false;
+        botonValidarCupon.textContent =
+            "Validar cupón";
+    }
+}
+
+async function consultarCupon(
+    codigoIngresado
+) {
+
+    const parametros =
+        new URLSearchParams({
+            codigo:
+                codigoIngresado
+        });
+
+    const response = await fetch(
+        `/api/inicio/creditos/cupones/validar?${
+            parametros.toString()
+        }`,
+        {
+            credentials: "same-origin",
+            cache: "no-store",
+
+            headers: {
+                "Accept":
+                    "application/json"
+            }
+        }
+    );
+
+    if (!response.ok) {
+
+        throw new Error(
+            await obtenerMensajeError(
+                response
+            )
+        );
+    }
+
+    return response.json();
+}
+
+function mostrarResultadoCupon(
+    cupon
+) {
+
+    resultadoCupon.textContent =
+        `${cupon.mensaje}. Válido hasta ${
+            formatearFecha(
+                cupon.fechaExpiracion
+            )
+        }.`;
+
+    resultadoCupon.className =
+        "resultado-cupon-valido mt-2";
+}
+
+function mostrarResultadoCuponError(
+    mensaje
+) {
+
+    resultadoCupon.textContent =
+        mensaje;
+
+    resultadoCupon.className =
+        "resultado-cupon-error mt-2";
+}
+
+function redondearMoneda(
+    valor
+) {
+
+    return Math.round(
+        (
+            Number(valor)
+            + Number.EPSILON
+        )
+        * 100
+    ) / 100;
 }
