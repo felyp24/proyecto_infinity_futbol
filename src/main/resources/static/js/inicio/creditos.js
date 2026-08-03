@@ -445,13 +445,19 @@ async function crearPreferenciaPago(
                     "Content-Type":
                         "application/json",
 
+                    "Accept":
+                        "application/json",
+
                     [csrf.headerName]:
                         csrf.token
                 },
 
                 body: JSON.stringify({
                     idPaqueteCredito:
-                        idPaquete
+                        idPaquete,
+
+                    codigoCupon:
+                        codigoCuponAplicado || null
                 })
             }
         );
@@ -469,29 +475,17 @@ async function crearPreferenciaPago(
 
         if (!resultado.urlCheckout) {
             throw new Error(
-                "Mercado Pago no devolvió "
-                + "la dirección del checkout."
+                "Mercado Pago no devolvió una URL de pago."
             );
         }
 
-        /*
-         * Conservamos el identificador local.
-         *
-         * Si trabajamos en localhost y Mercado Pago
-         * no puede redirigir automáticamente, al volver
-         * manualmente la página confirmará el pago.
-         */
         localStorage.setItem(
             CLAVE_PAGO_PENDIENTE,
             resultado.idPago
         );
 
-        boton.textContent =
-            "Redirigiendo...";
-
-        window.location.assign(
-            resultado.urlCheckout
-        );
+        window.location.href =
+            resultado.urlCheckout;
 
     } catch (error) {
 
@@ -499,6 +493,8 @@ async function crearPreferenciaPago(
             error.message,
             "danger"
         );
+
+    } finally {
 
         bloquearBoton(
             boton,

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Utilería por sede | Infinity Fútbol
+    </title>
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/componentes/navbar.css}"
+            rel="stylesheet"
+    >
+
+    <link
+            th:href="@{/css/coordinador/utileria.css}"
+            rel="stylesheet"
+    >
+
+</head>
+
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}">
+</div>
+
+<main class="utileria-contenedor">
+
+    <header class="utileria-encabezado">
+
+        <div>
+
+            <h1>
+                Utilería por sede
+            </h1>
+
+            <p>
+                Registra los implementos disponibles
+                y controla los faltantes de cada sede.
+            </p>
+
+        </div>
+
+        <button
+                id="botonNuevaUtileria"
+                type="button"
+                class="btn btn-success"
+        >
+            Registrar implemento
+        </button>
+
+    </header>
+
+    <section class="utileria-panel">
+
+        <form
+                id="formularioFiltros"
+                class="utileria-filtros"
+        >
+
+            <div>
+
+                <label
+                        for="filtroSede"
+                        class="form-label"
+                >
+                    Sede
+                </label>
+
+                <select
+                        id="filtroSede"
+                        class="form-select"
+                >
+                    <option value="">
+                        Todas las sedes
+                    </option>
+                </select>
+
+            </div>
+
+            <div>
+
+                <label
+                        for="filtroSituacion"
+                        class="form-label"
+                >
+                    Situación
+                </label>
+
+                <select
+                        id="filtroSituacion"
+                        class="form-select"
+                >
+                    <option value="">
+                        Todas
+                    </option>
+
+                    <option value="SUFICIENTE">
+                        Stock suficiente
+                    </option>
+
+                    <option value="BAJO_STOCK">
+                        Bajo stock
+                    </option>
+
+                    <option value="AGOTADO">
+                        Agotado
+                    </option>
+
+                    <option value="INACTIVO">
+                        Inactivo
+                    </option>
+                </select>
+
+            </div>
+
+            <div>
+
+                <label
+                        for="textoBusqueda"
+                        class="form-label"
+                >
+                    Buscar
+                </label>
+
+                <input
+                        id="textoBusqueda"
+                        type="search"
+                        class="form-control"
+                        maxlength="100"
+                        placeholder="Nombre, categoría o sede"
+                >
+
+            </div>
+
+            <div class="form-check utileria-inactivos">
+
+                <input
+                        id="incluirInactivos"
+                        type="checkbox"
+                        class="form-check-input"
+                >
+
+                <label
+                        for="incluirInactivos"
+                        class="form-check-label"
+                >
+                    Mostrar eliminados
+                </label>
+
+            </div>
+
+            <button
+                    type="submit"
+                    class="btn btn-outline-success"
+            >
+                Buscar
+            </button>
+
+        </form>
+
+        <div
+                id="mensajePagina"
+                class="alert alert-info mt-3"
+                role="alert"
+        >
+            Cargando utilería...
+        </div>
+
+        <div class="utileria-resumen">
+
+            <article>
+                <span>Ítems activos</span>
+                <strong id="itemsActivos">0</strong>
+            </article>
+
+            <article>
+                <span>Bajo stock</span>
+                <strong id="itemsBajoStock">0</strong>
+            </article>
+
+            <article>
+                <span>Agotados</span>
+                <strong id="itemsAgotados">0</strong>
+            </article>
+
+            <article>
+                <span>Unidades faltantes</span>
+                <strong id="unidadesFaltantes">0</strong>
+            </article>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+
+                <tr>
+                    <th>Sede</th>
+                    <th>Implemento</th>
+                    <th>Categoría</th>
+                    <th>Disponible</th>
+                    <th>Mínimo</th>
+                    <th>Faltante</th>
+                    <th>Situación</th>
+                    <th>Actualizado por</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+
+                </thead>
+
+                <tbody id="tablaUtileria">
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div
+        id="modalUtileria"
+        class="modal fade"
+        tabindex="-1"
+        aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <form id="formularioUtileria">
+
+                <div class="modal-header">
+
+                    <h2
+                            id="modalTitulo"
+                            class="modal-title fs-5"
+                    >
+                        Registrar implemento
+                    </h2>
+
+                    <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input
+                            id="idUtileria"
+                            type="hidden"
+                    >
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="idSedeFormulario"
+                                    class="form-label"
+                            >
+                                Sede
+                            </label>
+
+                            <select
+                                    id="idSedeFormulario"
+                                    class="form-select"
+                                    required
+                            >
+                                <option value="">
+                                    Seleccione una sede
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="nombre"
+                                    class="form-label"
+                            >
+                                Nombre del implemento
+                            </label>
+
+                            <input
+                                    id="nombre"
+                                    type="text"
+                                    class="form-control"
+                                    maxlength="100"
+                                    required
+                                    placeholder="Ejemplo: Balón número 5"
+                            >
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="categoria"
+                                    class="form-label"
+                            >
+                                Categoría
+                            </label>
+
+                            <select
+                                    id="categoria"
+                                    class="form-select"
+                                    required
+                            >
+                                <option value="">
+                                    Seleccione una categoría
+                                </option>
+
+                                <option value="BALONES">Balones</option>
+                                <option value="CONOS">Conos</option>
+                                <option value="PETOS">Petos</option>
+                                <option value="ESCALERAS">Escaleras</option>
+                                <option value="VALLAS">Vallas</option>
+                                <option value="ARCOS">Arcos</option>
+                                <option value="BOTIQUIN">Botiquín</option>
+                                <option value="OTROS">Otros</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="unidadMedida"
+                                    class="form-label"
+                            >
+                                Unidad de medida
+                            </label>
+
+                            <select
+                                    id="unidadMedida"
+                                    class="form-select"
+                                    required
+                            >
+                                <option value="UNIDAD">Unidad</option>
+                                <option value="PAR">Par</option>
+                                <option value="JUEGO">Juego</option>
+                                <option value="CAJA">Caja</option>
+                                <option value="PAQUETE">Paquete</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="cantidadActual"
+                                    class="form-label"
+                            >
+                                Cantidad actual
+                            </label>
+
+                            <input
+                                    id="cantidadActual"
+                                    type="number"
+                                    class="form-control"
+                                    min="0"
+                                    max="100000"
+                                    value="0"
+                                    required
+                            >
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label
+                                    for="stockMinimo"
+                                    class="form-label"
+                            >
+                                Stock mínimo requerido
+                            </label>
+
+                            <input
+                                    id="stockMinimo"
+                                    type="number"
+                                    class="form-control"
+                                    min="0"
+                                    max="100000"
+                                    value="0"
+                                    required
+                            >
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <label
+                                    for="observacion"
+                                    class="form-label"
+                            >
+                                Observación
+                            </label>
+
+                            <textarea
+                                    id="observacion"
+                                    class="form-control"
+                                    maxlength="255"
+                                    rows="3"
+                                    placeholder="Estado físico, detalles o necesidades"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                            id="botonGuardar"
+                            type="submit"
+                            class="btn btn-success"
+                    >
+                        Guardar
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<script th:src="@{/js/componentes/navbar.js}">
+</script>
+
+<script th:src="@{/js/coordinador/utileria.js}">
+</script>
+
+<script th:src="@{/js/auth/logout.js}">
+</script>
+
+</body>
+</html>
